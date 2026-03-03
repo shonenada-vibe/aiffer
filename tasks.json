@@ -162,7 +162,7 @@
       "Add 'Clear All' button to remove all comments (with confirmation dialog)",
       "Panel can be toggled via a button in the top header bar"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "012-comment-serialization",

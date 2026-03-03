@@ -4,12 +4,14 @@
   import Sidebar from "./lib/components/Sidebar.svelte";
   import DiffContent from "./lib/components/DiffContent.svelte";
   import AiPanel from "./lib/components/AiPanel.svelte";
+  import ReviewSummary from "./lib/components/ReviewSummary.svelte";
   import { diffStore } from "./lib/stores/diff.svelte";
   import { commentStore } from "./lib/stores/comments.svelte";
   import type { DiffLine } from "./lib/types/diff";
 
   let sidebarWidth = $state(250);
   let aiPanelOpen = $state(false);
+  let reviewPanelOpen = $state(false);
 
   async function handleOpenFolder() {
     const selected = await open({
@@ -23,7 +25,13 @@
   }
 
   function handleSubmitReview() {
+    reviewPanelOpen = !reviewPanelOpen;
+  }
+
+  function handleSubmitToAi() {
     // Placeholder — will be implemented in task 013
+    reviewPanelOpen = false;
+    aiPanelOpen = true;
   }
 
   async function handleRefresh() {
@@ -76,6 +84,12 @@
       totalAdditions={diffStore.totalAdditions}
       totalDeletions={diffStore.totalDeletions}
       onSubmitComment={handleSubmitComment}
+    />
+
+    <ReviewSummary
+      isOpen={reviewPanelOpen}
+      onClose={() => (reviewPanelOpen = false)}
+      onSubmitToAi={handleSubmitToAi}
     />
 
     <AiPanel isOpen={aiPanelOpen} onClose={() => (aiPanelOpen = false)} />
