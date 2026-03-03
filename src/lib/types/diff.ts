@@ -43,3 +43,13 @@ export interface FileEntry {
   additions: number;
   deletions: number;
 }
+
+export type DiffType = "unstaged" | "staged" | "commits";
+
+export interface CommitInfo {
+  oid: string;
+  shortId: string;
+  summary: string;
+  author: string;
+  timestamp: number;
+}

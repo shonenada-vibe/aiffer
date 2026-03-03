@@ -110,6 +110,17 @@ pub struct ReviewPayload {
     pub formatted_text: String,
 }
 
+/// A single commit entry for the commit selector.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitInfo {
+    pub oid: String,
+    pub short_id: String,
+    pub summary: String,
+    pub author: String,
+    pub timestamp: i64,
+}
+
 /// Application settings persisted to disk.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

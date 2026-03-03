@@ -236,7 +236,7 @@
       "Preserve comments when switching diff types (warn user if comments may become invalid)",
       "Show the current diff type prominently in the header"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "017-keyboard-shortcuts",

@@ -3,7 +3,7 @@ use std::path::Path;
 use git2::{Delta, Diff, DiffOptions, Repository};
 
 use crate::models::{
-    DiffFile, DiffHunk, DiffLine, DiffStats, FileEntry, FileStatus, LineType,
+    CommitInfo, DiffFile, DiffHunk, DiffLine, DiffStats, FileEntry, FileStatus, LineType,
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -14,8 +14,11 @@ pub enum GitError {
     #[error("Not a git repository: {0}")]
     NotARepo(String),
 
-    #[error("Invalid diff type: {0}. Use 'unstaged' or 'staged'")]
+    #[error("Invalid diff type: {0}. Use 'unstaged', 'staged', or 'commits'")]
     InvalidDiffType(String),
+
+    #[error("Invalid commit reference: {0}")]
+    InvalidRef(String),
 }
 
 /// Open a git repository at the given path.
@@ -43,6 +46,61 @@ pub fn get_diff<'a>(repo: &'a Repository, diff_type: &str) -> Result<Diff<'a>, G
         }
         other => Err(GitError::InvalidDiffType(other.to_string())),
     }
+}
+
+/// Get the diff between two commit references (sha, branch, tag, etc.).
+pub fn get_diff_between_commits<'a>(
+    repo: &'a Repository,
+    from_ref: &str,
+    to_ref: &str,
+) -> Result<Diff<'a>, GitError> {
+    let from_obj = repo
+        .revparse_single(from_ref)
+        .map_err(|_| GitError::InvalidRef(from_ref.to_string()))?;
+    let to_obj = repo
+        .revparse_single(to_ref)
+        .map_err(|_| GitError::InvalidRef(to_ref.to_string()))?;
+
+    let from_tree = from_obj
+        .peel_to_tree()
+        .map_err(|_| GitError::InvalidRef(from_ref.to_string()))?;
+    let to_tree = to_obj
+        .peel_to_tree()
+        .map_err(|_| GitError::InvalidRef(to_ref.to_string()))?;
+
+    let mut opts = DiffOptions::new();
+    let diff = repo.diff_tree_to_tree(Some(&from_tree), Some(&to_tree), Some(&mut opts))?;
+    Ok(diff)
+}
+
+/// Get the list of recent commits (most recent first).
+pub fn get_commits(repo: &Repository, max_count: usize) -> Result<Vec<CommitInfo>, GitError> {
+    let mut revwalk = repo.revwalk()?;
+    revwalk.push_head()?;
+    revwalk.set_sorting(git2::Sort::TIME)?;
+
+    let mut commits = Vec::new();
+    for oid_result in revwalk.take(max_count) {
+        let oid = oid_result?;
+        let commit = repo.find_commit(oid)?;
+        let short_id = oid.to_string()[..7].to_string();
+        let summary = commit
+            .summary()
+            .unwrap_or("(no message)")
+            .to_string();
+        let author = commit.author().name().unwrap_or("Unknown").to_string();
+        let timestamp = commit.time().seconds();
+
+        commits.push(CommitInfo {
+            oid: oid.to_string(),
+            short_id,
+            summary,
+            author,
+            timestamp,
+        });
+    }
+
+    Ok(commits)
 }
 
 /// Convert a git2 Delta to our FileStatus enum.

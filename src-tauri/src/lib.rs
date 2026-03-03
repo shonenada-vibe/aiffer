@@ -11,6 +11,7 @@ pub fn run() {
             commands::greet,
             commands::get_diff,
             commands::get_file_status,
+            commands::get_commits,
             commands::build_review_payload,
             commands::submit_review,
             commands::load_settings,

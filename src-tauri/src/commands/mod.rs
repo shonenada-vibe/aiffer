@@ -1,8 +1,8 @@
 use crate::ai::{self, AiConfig};
 use crate::git;
 use crate::models::{
-    AppSettings, CommentInput, CommentWithContext, DiffFile, DiffLine, FileEntry, FileSummary,
-    ReviewPayload,
+    AppSettings, CommentInput, CommentWithContext, CommitInfo, DiffFile, DiffLine, FileEntry,
+    FileSummary, ReviewPayload,
 };
 use std::fs;
 use std::path::PathBuf;
@@ -36,13 +36,33 @@ pub fn greet(name: &str) -> String {
 }
 
 /// Get the full diff for a repository path.
-/// `diff_type` should be "unstaged" or "staged".
+/// `diff_type` should be "unstaged", "staged", or "commits".
+/// When `diff_type` is "commits", `from_ref` and `to_ref` must be provided.
 #[tauri::command]
-pub fn get_diff(path: String, diff_type: String) -> Result<Vec<DiffFile>, CommandError> {
+pub fn get_diff(
+    path: String,
+    diff_type: String,
+    from_ref: Option<String>,
+    to_ref: Option<String>,
+) -> Result<Vec<DiffFile>, CommandError> {
     let repo = git::open_repo(&path)?;
-    let diff = git::get_diff(&repo, &diff_type)?;
+    let diff = if diff_type == "commits" {
+        let from = from_ref.unwrap_or_default();
+        let to = to_ref.unwrap_or_default();
+        git::get_diff_between_commits(&repo, &from, &to)?
+    } else {
+        git::get_diff(&repo, &diff_type)?
+    };
     let files = git::parse_diff(&diff)?;
     Ok(files)
+}
+
+/// Get the list of recent commits for a repository.
+#[tauri::command]
+pub fn get_commits(path: String, max_count: Option<usize>) -> Result<Vec<CommitInfo>, CommandError> {
+    let repo = git::open_repo(&path)?;
+    let commits = git::get_commits(&repo, max_count.unwrap_or(50))?;
+    Ok(commits)
 }
 
 /// Build a review payload that enriches comments with surrounding code context.

@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { DiffFile, FileEntry } from "../types/diff";
+import type { CommitInfo, DiffFile, DiffType, FileEntry } from "../types/diff";
 
 // Reactive state using module-level $state runes
 let _folderPath = $state("");
@@ -8,7 +8,10 @@ let _diffFiles = $state<DiffFile[]>([]);
 let _selectedFile = $state<string | null>(null);
 let _loading = $state(false);
 let _error = $state<string | null>(null);
-let _diffType = $state<"unstaged" | "staged">("unstaged");
+let _diffType = $state<DiffType>("unstaged");
+let _commits = $state<CommitInfo[]>([]);
+let _fromRef = $state<string | null>(null);
+let _toRef = $state<string | null>(null);
 
 // Derived totals
 let _totalAdditions = $derived(
@@ -40,6 +43,15 @@ export const diffStore = {
   get diffType() {
     return _diffType;
   },
+  get commits() {
+    return _commits;
+  },
+  get fromRef() {
+    return _fromRef;
+  },
+  get toRef() {
+    return _toRef;
+  },
   get totalAdditions() {
     return _totalAdditions;
   },
@@ -55,8 +67,28 @@ export const diffStore = {
     _selectedFile = path;
   },
 
-  setDiffType(type: "unstaged" | "staged") {
-    _diffType = type;
+  setDiffType(type_: DiffType) {
+    _diffType = type_;
+  },
+
+  setFromRef(ref_: string | null) {
+    _fromRef = ref_;
+  },
+
+  setToRef(ref_: string | null) {
+    _toRef = ref_;
+  },
+
+  async loadCommits() {
+    if (!_folderPath) return;
+    try {
+      const commits = await invoke<CommitInfo[]>("get_commits", {
+        path: _folderPath,
+      });
+      _commits = commits;
+    } catch {
+      _commits = [];
+    }
   },
 
   async refresh() {
@@ -66,12 +98,18 @@ export const diffStore = {
     _error = null;
 
     try {
+      const diffArgs: Record<string, unknown> = {
+        path: _folderPath,
+        diffType: _diffType,
+      };
+      if (_diffType === "commits") {
+        diffArgs.fromRef = _fromRef;
+        diffArgs.toRef = _toRef;
+      }
+
       const [files, diffFiles] = await Promise.all([
         invoke<FileEntry[]>("get_file_status", { path: _folderPath }),
-        invoke<DiffFile[]>("get_diff", {
-          path: _folderPath,
-          diffType: _diffType,
-        }),
+        invoke<DiffFile[]>("get_diff", diffArgs),
       ]);
 
       _files = files;
@@ -94,6 +132,7 @@ export const diffStore = {
     _folderPath = path;
     _selectedFile = null;
     _error = null;
+    await this.loadCommits();
     await this.refresh();
   },
 };

@@ -1,27 +1,55 @@
 <script lang="ts">
+  import type { CommitInfo, DiffType } from "../types/diff";
+
   interface Props {
     folderPath: string;
     commentCount: number;
+    diffType: DiffType;
+    commits: CommitInfo[];
+    fromRef: string | null;
+    toRef: string | null;
     onSubmitReview: () => void;
     onOpenFolder: () => void;
     onToggleAiPanel: () => void;
     onToggleSettings: () => void;
     onRefresh: () => void;
+    onDiffTypeChange: (type_: DiffType) => void;
+    onFromRefChange: (ref_: string) => void;
+    onToRefChange: (ref_: string) => void;
   }
 
   let {
     folderPath,
     commentCount,
+    diffType,
+    commits,
+    fromRef,
+    toRef,
     onSubmitReview,
     onOpenFolder,
     onToggleAiPanel,
     onToggleSettings,
     onRefresh,
+    onDiffTypeChange,
+    onFromRefChange,
+    onToRefChange,
   }: Props = $props();
 
   let folderName = $derived(
     folderPath ? folderPath.split("/").pop() ?? folderPath : "No folder open",
   );
+
+  const DIFF_TYPE_LABELS: Record<DiffType, string> = {
+    unstaged: "Unstaged Changes",
+    staged: "Staged Changes",
+    commits: "Between Commits",
+  };
+
+  function formatCommitLabel(c: CommitInfo): string {
+    const summary =
+      c.summary.length > 40 ? c.summary.slice(0, 40) + "…" : c.summary;
+    return `${c.shortId} — ${summary}`;
+  }
 </script>
 
 <header
@@ -65,6 +93,50 @@
       <span class="max-w-xs truncate text-xs text-gray-500" title={folderPath}>
         {folderPath}
       </span>
+    {/if}
+  </div>
+
+  <!-- Center section: diff type selector -->
+  <div class="flex items-center gap-2">
+    <select
+      class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+      value={diffType}
+      onchange={(e) =>
+        onDiffTypeChange(
+          (e.target as HTMLSelectElement).value as DiffType,
+        )}
+    >
+      {#each Object.entries(DIFF_TYPE_LABELS) as [value, label]}
+        <option {value}>{label}</option>
+      {/each}
+    </select>
+
+    {#if diffType === "commits"}
+      <select
+        class="max-w-48 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+        value={fromRef ?? ""}
+        onchange={(e) =>
+          onFromRefChange((e.target as HTMLSelectElement).value)}
+      >
+        <option value="" disabled>From…</option>
+        {#each commits as c}
+          <option value={c.oid}>{formatCommitLabel(c)}</option>
+        {/each}
+      </select>
+
+      <span class="text-xs text-gray-500">→</span>
+
+      <select
+        class="max-w-48 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+        value={toRef ?? ""}
+        onchange={(e) =>
+          onToRefChange((e.target as HTMLSelectElement).value)}
+      >
+        <option value="" disabled>To…</option>
+        {#each commits as c}
+          <option value={c.oid}>{formatCommitLabel(c)}</option>
+        {/each}
+      </select>
     {/if}
   </div>
 

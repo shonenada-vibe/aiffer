@@ -10,7 +10,7 @@
   import { diffStore } from "./lib/stores/diff.svelte";
   import { commentStore } from "./lib/stores/comments.svelte";
   import { settingsStore } from "./lib/stores/settings.svelte";
-  import type { DiffLine } from "./lib/types/diff";
+  import type { DiffLine, DiffType } from "./lib/types/diff";
   import type { CommentInput, ReviewPayload } from "./lib/types/comment";
 
   let sidebarWidth = $state(250);
@@ -82,6 +82,37 @@
     }
   }
 
+  async function handleDiffTypeChange(type_: DiffType) {
+    if (
+      commentStore.commentCount > 0 &&
+      !confirm(
+        "Switching diff types may invalidate existing comments. Continue?",
+      )
+    ) {
+      return;
+    }
+    diffStore.setDiffType(type_);
+    if (type_ === "commits") {
+      await diffStore.loadCommits();
+    } else {
+      await diffStore.refresh();
+    }
+  }
+
+  async function handleFromRefChange(ref_: string) {
+    diffStore.setFromRef(ref_);
+    if (diffStore.toRef) {
+      await diffStore.refresh();
+    }
+  }
+
+  async function handleToRefChange(ref_: string) {
+    diffStore.setToRef(ref_);
+    if (diffStore.fromRef) {
+      await diffStore.refresh();
+    }
+  }
+
   async function handleRefresh() {
     await diffStore.refresh();
   }
@@ -104,11 +135,18 @@
   <Header
     folderPath={diffStore.folderPath}
     commentCount={commentStore.commentCount}
+    diffType={diffStore.diffType}
+    commits={diffStore.commits}
+    fromRef={diffStore.fromRef}
+    toRef={diffStore.toRef}
     onSubmitReview={handleSubmitReview}
     onOpenFolder={handleOpenFolder}
     onToggleAiPanel={() => (aiPanelOpen = !aiPanelOpen)}
     onToggleSettings={() => (settingsOpen = !settingsOpen)}
     onRefresh={handleRefresh}
+    onDiffTypeChange={handleDiffTypeChange}
+    onFromRefChange={handleFromRefChange}
+    onToRefChange={handleToRefChange}
   />
 
   <div class="flex flex-1 overflow-hidden">
