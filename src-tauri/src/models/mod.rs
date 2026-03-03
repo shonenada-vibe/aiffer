@@ -64,3 +64,48 @@ pub struct FileEntry {
     pub additions: usize,
     pub deletions: usize,
 }
+
+/// Comment input from the frontend.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommentInput {
+    pub file_path: String,
+    pub line_number: u32,
+    pub line_type: LineType,
+    pub body: String,
+}
+
+/// A comment enriched with surrounding code context.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommentWithContext {
+    pub file_path: String,
+    pub line_number: u32,
+    pub line_type: LineType,
+    pub body: String,
+    pub line_content: String,
+    pub context_before: Vec<String>,
+    pub context_after: Vec<String>,
+}
+
+/// Summary of a changed file for the review payload.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FileSummary {
+    pub path: String,
+    pub status: FileStatus,
+    pub additions: usize,
+    pub deletions: usize,
+}
+
+/// The full review payload sent to the AI agent.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReviewPayload {
+    pub comments: Vec<CommentWithContext>,
+    pub file_summary: Vec<FileSummary>,
+    pub total_files_changed: usize,
+    pub total_additions: usize,
+    pub total_deletions: usize,
+    pub formatted_text: String,
+}
