@@ -207,7 +207,7 @@
       "Panel slides in from right when AI response is received",
       "Add close button to dismiss the panel"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "015-settings-panel",

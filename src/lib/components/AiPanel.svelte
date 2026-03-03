@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { marked } from "marked";
+
   interface Props {
     isOpen: boolean;
     loading: boolean;
@@ -10,6 +12,20 @@
 
   let { isOpen, loading, response, error, onClose, onRetry }: Props =
     $props();
+
+  let copied = $state(false);
+
+  let renderedHtml = $derived(response ? marked.parse(response) : "");
+
+  async function copyToClipboard() {
+    try {
+      await navigator.clipboard.writeText(response);
+      copied = true;
+      setTimeout(() => (copied = false), 2000);
+    } catch {
+      // Fallback: noop
+    }
+  }
 </script>
 
 {#if isOpen}
@@ -23,24 +39,60 @@
       >
         AI Response
       </span>
-      <button
-        onclick={onClose}
-        class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
-        title="Close panel"
-      >
-        <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"
-          />
-        </svg>
-      </button>
+      <div class="flex items-center gap-1">
+        {#if response && !loading}
+          <button
+            onclick={copyToClipboard}
+            class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+            title={copied ? "Copied!" : "Copy to clipboard"}
+          >
+            {#if copied}
+              <svg
+                class="h-4 w-4 text-green-500"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"
+                />
+              </svg>
+            {:else}
+              <svg
+                class="h-4 w-4"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"
+                />
+                <path
+                  d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"
+                />
+              </svg>
+            {/if}
+          </button>
+        {/if}
+        <button
+          onclick={onClose}
+          class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+          title="Close panel"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Panel content -->
     <div class="flex-1 overflow-y-auto p-4">
       {#if loading}
         <!-- Loading state -->
-        <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+        <div
+          class="flex flex-col items-center justify-center py-12 text-gray-400"
+        >
           <div
             class="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500"
           ></div>
@@ -54,11 +106,7 @@
         <div
           class="flex flex-col items-center justify-center py-12 text-red-400"
         >
-          <svg
-            class="mb-3 h-8 w-8"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-          >
+          <svg class="mb-3 h-8 w-8" viewBox="0 0 16 16" fill="currentColor">
             <path
               d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"
             />
@@ -75,20 +123,18 @@
           </button>
         </div>
       {:else if response}
-        <!-- Response content -->
-        <div class="prose prose-sm max-w-none text-gray-800">
-          <pre class="whitespace-pre-wrap break-words text-sm">{response}</pre>
+        <!-- Rendered markdown response -->
+        <div
+          class="prose prose-sm max-w-none text-gray-800 prose-headings:text-gray-900 prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:leading-relaxed prose-code:rounded prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none prose-pre:bg-gray-900 prose-pre:text-gray-100"
+        >
+          {@html renderedHtml}
         </div>
       {:else}
         <!-- Empty state -->
         <div
           class="flex flex-col items-center justify-center py-12 text-gray-400"
         >
-          <svg
-            class="mb-2 h-8 w-8"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-          >
+          <svg class="mb-2 h-8 w-8" viewBox="0 0 16 16" fill="currentColor">
             <path
               d="M5.433 2.304A4.494 4.494 0 0 0 3.5 6c0 1.598.564 3.05 1.47 4.235a6.517 6.517 0 0 0-1.97.77.75.75 0 1 0 .782 1.283c.628-.383 1.37-.662 2.218-.79a4.478 4.478 0 0 0 4 0c.848.128 1.59.407 2.218.79a.75.75 0 1 0 .782-1.283 6.517 6.517 0 0 0-1.97-.77A7.486 7.486 0 0 0 12.5 6a4.494 4.494 0 0 0-1.933-3.696A4.484 4.484 0 0 0 8 1.5a4.484 4.484 0 0 0-2.567.804ZM10 8.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
             />
