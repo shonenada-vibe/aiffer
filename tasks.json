@@ -1,0 +1,331 @@
+[
+  {
+    "id": "001-scaffold-tauri-svelte",
+    "category": "setup",
+    "description": "Initialize Tauri v2 + Svelte 5 project with TailwindCSS v4",
+    "steps": [
+      "Create Tauri v2 project with Svelte frontend using `bun create tauri-app` or manual setup",
+      "Configure Svelte 5 with TypeScript strict mode",
+      "Install and configure TailwindCSS v4 with @tailwindcss/vite",
+      "Verify `cargo tauri dev` launches the app window with a Hello World page",
+      "Verify hot-reload works for both Svelte and Rust changes",
+      "Ensure `cargo check` and `cargo clippy` pass with no warnings"
+    ],
+    "passes": true
+  },
+  {
+    "id": "002-app-shell-layout",
+    "category": "ui",
+    "description": "Build the main app shell layout with sidebar, header, and content area",
+    "steps": [
+      "Create a top header bar with app name 'Aiffer', folder path display area, and a 'Submit Review' button placeholder",
+      "Create a left sidebar panel (resizable, ~250px default width) for the file tree",
+      "Create a main content area that fills remaining space for the diff viewer",
+      "Add a collapsible right panel placeholder for AI response",
+      "Apply GitHub-inspired styling: dark header, white/neutral content background, subtle borders",
+      "Verify layout is responsive and panels don't overflow"
+    ],
+    "passes": true
+  },
+  {
+    "id": "003-rust-git-diff-reading",
+    "category": "backend",
+    "description": "Implement git diff reading in Rust using git2 crate",
+    "steps": [
+      "Add git2, serde, serde_json, thiserror, chrono, uuid dependencies to Cargo.toml",
+      "Create src-tauri/src/models/ module with DiffFile, DiffHunk, DiffLine, FileStatus structs (all Serialize/Deserialize)",
+      "Create src-tauri/src/git/ module with function to open a git repo from a given path",
+      "Implement function to read unstaged diff (working directory vs index)",
+      "Implement function to read staged diff (index vs HEAD)",
+      "Parse raw diff into structured DiffFile → DiffHunk → DiffLine hierarchy",
+      "Write unit tests: test parsing a known diff produces correct structure",
+      "Ensure cargo test passes"
+    ],
+    "passes": true
+  },
+  {
+    "id": "004-tauri-diff-commands",
+    "category": "backend",
+    "description": "Create Tauri IPC commands to expose git diff data to frontend",
+    "steps": [
+      "Create src-tauri/src/commands/ module",
+      "Implement #[tauri::command] get_diff(path: String, diff_type: String) that returns Vec<DiffFile>",
+      "Implement #[tauri::command] get_file_status(path: String) that returns list of changed files with their statuses",
+      "Register commands in Tauri builder (main.rs invoke_handler)",
+      "Test commands via frontend console: invoke('get_diff', { path: '.', diffType: 'unstaged' })",
+      "Handle errors gracefully — return user-friendly error messages for non-git directories"
+    ],
+    "passes": true
+  },
+  {
+    "id": "005-file-tree-sidebar",
+    "category": "ui",
+    "description": "Build the file tree sidebar showing changed files with status indicators",
+    "steps": [
+      "Create FileTree.svelte component that calls get_file_status Tauri command on mount",
+      "Display files in a vertical list with file path and status icon (A=green, M=yellow, D=red, R=blue)",
+      "Show diff stats per file (+N -M) in muted text next to each file",
+      "Highlight the currently selected file",
+      "Clicking a file scrolls the main diff viewer to that file's section",
+      "Add a folder open button in the header that triggers Tauri file dialog to select a folder",
+      "Add a refresh button to re-read diffs",
+      "Show overall diff summary at the top (total files changed, additions, deletions)"
+    ],
+    "passes": true
+  },
+  {
+    "id": "006-diff-viewer-basic",
+    "category": "ui",
+    "description": "Build the unified diff viewer displaying file diffs with line numbers",
+    "steps": [
+      "Create DiffViewer.svelte component that receives diff data and renders all files",
+      "Create DiffFileSection.svelte — collapsible section per file with header (path, status badge, stats)",
+      "Create DiffHunk.svelte — renders a hunk with @@ header line in blue/purple",
+      "Create DiffLine.svelte — renders a single line with old/new line numbers in the gutter",
+      "Apply GitHub diff colors: green background (#e6ffec) for additions, red (#ffebe9) for deletions, white for context",
+      "Use monospace font for diff content",
+      "Verify multi-file diffs render correctly with proper line numbering",
+      "Verify file sections can be collapsed/expanded"
+    ],
+    "passes": true
+  },
+  {
+    "id": "007-diff-viewer-enhancements",
+    "category": "ui",
+    "description": "Add hover effects, line highlighting, and expand/collapse to diff viewer",
+    "steps": [
+      "Add hover highlight on diff lines (subtle background change on mouseover)",
+      "Show a '+' icon in the gutter on line hover (comment trigger button)",
+      "Add click-to-select line highlighting (like GitHub's yellow highlight when clicking line numbers)",
+      "Add 'Expand all' / 'Collapse all' buttons for file sections in the header",
+      "Add smooth scroll-to-file when clicking file in sidebar",
+      "Ensure line numbers are properly aligned and never wrap"
+    ],
+    "passes": true
+  },
+  {
+    "id": "008-comment-data-model",
+    "category": "functional",
+    "description": "Implement comment data model and state management in Svelte stores",
+    "steps": [
+      "Define TypeScript types: Comment, CommentWithContext in src/lib/types/",
+      "Create a Svelte store (comments.ts) that holds Map<string, Comment[]> keyed by 'filepath:lineno'",
+      "Implement addComment(filePath, lineNumber, lineType, body) action",
+      "Implement removeComment(commentId) action",
+      "Implement editComment(commentId, newBody) action",
+      "Implement getCommentsForLine(filePath, lineNumber) derived getter",
+      "Implement getAllComments() that returns a flat sorted list of all comments",
+      "Write basic store tests or verify via manual testing"
+    ],
+    "passes": true
+  },
+  {
+    "id": "009-inline-comment-form",
+    "category": "ui",
+    "description": "Build the inline comment form that appears when clicking the '+' icon on a diff line",
+    "steps": [
+      "Create CommentForm.svelte — a form that appears below the target diff line",
+      "Form includes: textarea for comment body, 'Add Comment' submit button, 'Cancel' button",
+      "Clicking the '+' gutter icon opens the form below that line (pushes content down)",
+      "Pressing Cmd+Enter submits the comment",
+      "Pressing Escape cancels and closes the form",
+      "After submitting, the form closes and the comment appears as a CommentThread",
+      "Style to match GitHub: white card with subtle border, rounded corners, shadow"
+    ],
+    "passes": true
+  },
+  {
+    "id": "010-comment-thread-display",
+    "category": "ui",
+    "description": "Build comment thread display showing existing comments on diff lines",
+    "steps": [
+      "Create CommentThread.svelte — renders below a diff line when comments exist",
+      "Display each comment with: avatar placeholder, timestamp, comment body",
+      "Add 'Edit' button that turns the comment body into an editable textarea",
+      "Add 'Delete' button with confirmation",
+      "Show a comment count badge on the gutter for lines that have comments",
+      "Comments collapse by default if there are more than 3; show 'Show N more' link",
+      "Style to match GitHub comment cards: border-left accent, subtle background"
+    ],
+    "passes": false
+  },
+  {
+    "id": "011-review-summary-panel",
+    "category": "ui",
+    "description": "Build the review summary panel showing all comments collected",
+    "steps": [
+      "Create ReviewSummary.svelte — a panel showing all comments grouped by file",
+      "Each entry shows: file path, line number, comment body, and a snippet of the code line",
+      "Clicking an entry scrolls to that comment in the diff viewer",
+      "Show total comment count in the header",
+      "Add 'Submit Review' button that triggers AI submission",
+      "Add 'Clear All' button to remove all comments (with confirmation dialog)",
+      "Panel can be toggled via a button in the top header bar"
+    ],
+    "passes": false
+  },
+  {
+    "id": "012-comment-serialization",
+    "category": "backend",
+    "description": "Implement comment collection and serialization for AI agent payload",
+    "steps": [
+      "Create ReviewPayload struct in Rust models: comments with context, diff summary, file list",
+      "Create CommentWithContext struct: comment fields + surrounding code lines (3 lines above and below)",
+      "Implement Tauri command build_review_payload(path, comments_json) that enriches comments with code context",
+      "The payload should include: the comment body, the exact line commented on, surrounding context lines, file path, and line number",
+      "Serialize the payload to a clean, readable string format suitable for LLM consumption",
+      "Write unit test: given sample comments and diff, verify payload structure"
+    ],
+    "passes": false
+  },
+  {
+    "id": "013-ai-agent-integration",
+    "category": "functional",
+    "description": "Implement AI agent communication — send review payload and receive response",
+    "steps": [
+      "Create src-tauri/src/ai/ module for AI agent communication",
+      "Implement a generic AI client trait that can be backed by different providers",
+      "Implement OpenAI-compatible API client (works with OpenAI, Anthropic via proxy, local models)",
+      "Create Tauri command submit_review(payload_json, api_config) that sends to AI and returns response",
+      "API config includes: endpoint URL, API key, model name",
+      "Build a system prompt that instructs the AI to interpret review comments and explain what changes the user wants",
+      "Handle streaming responses if possible, otherwise return full response",
+      "Handle API errors gracefully with user-friendly messages"
+    ],
+    "passes": false
+  },
+  {
+    "id": "014-ai-response-panel",
+    "category": "ui",
+    "description": "Build the AI response display panel",
+    "steps": [
+      "Create AiResponsePanel.svelte — right panel that shows AI agent's response",
+      "Display response with basic markdown rendering (bold, italic, code blocks, lists)",
+      "Show a loading spinner while waiting for AI response",
+      "Show error state if AI request fails with retry button",
+      "Add 'Copy to Clipboard' button for the AI response",
+      "Panel slides in from right when AI response is received",
+      "Add close button to dismiss the panel"
+    ],
+    "passes": false
+  },
+  {
+    "id": "015-settings-panel",
+    "category": "ui",
+    "description": "Build settings panel for AI configuration and app preferences",
+    "steps": [
+      "Create Settings.svelte — modal or slide-over panel for app settings",
+      "Add AI Configuration section: API endpoint URL, API key (masked input), model name",
+      "Add Diff Options section: toggle staged/unstaged diff, number of context lines",
+      "Persist settings using Tauri's fs or store plugin (save to local config file)",
+      "Load settings on app startup",
+      "Add a gear icon in the header that opens settings",
+      "Validate API key format and endpoint URL before saving"
+    ],
+    "passes": false
+  },
+  {
+    "id": "016-diff-type-toggle",
+    "category": "functional",
+    "description": "Add toggle between staged, unstaged, and commit-range diffs",
+    "steps": [
+      "Add a diff type selector in the header: 'Unstaged Changes', 'Staged Changes', 'Between Commits'",
+      "Implement Rust backend support for comparing two arbitrary commits",
+      "When 'Between Commits' is selected, show two commit selector dropdowns (from/to)",
+      "Switching diff type re-fetches and re-renders the diff",
+      "Preserve comments when switching diff types (warn user if comments may become invalid)",
+      "Show the current diff type prominently in the header"
+    ],
+    "passes": false
+  },
+  {
+    "id": "017-keyboard-shortcuts",
+    "category": "functional",
+    "description": "Add keyboard shortcuts for common actions",
+    "steps": [
+      "Implement keyboard shortcut handler at the app level",
+      "Add shortcuts: 'n' = next file, 'p' = previous file in diff viewer",
+      "Add shortcuts: 'j' = next hunk, 'k' = previous hunk within current file",
+      "Add shortcut: 'c' = open comment form on currently highlighted line",
+      "Add shortcut: 'Cmd+Enter' = submit review",
+      "Add shortcut: 'Cmd+Shift+R' = refresh diffs",
+      "Add shortcut: '?' = show keyboard shortcut help overlay",
+      "Ensure shortcuts don't fire when typing in text inputs"
+    ],
+    "passes": false
+  },
+  {
+    "id": "018-syntax-highlighting",
+    "category": "ui",
+    "description": "Add syntax highlighting for diff content based on file type",
+    "steps": [
+      "Integrate a lightweight syntax highlighting library (e.g., Prism.js or highlight.js via CDN or bundled)",
+      "Detect file language from file extension",
+      "Apply syntax highlighting to diff line content while preserving diff coloring",
+      "Support at minimum: JavaScript, TypeScript, Rust, Python, Go, HTML, CSS, JSON, YAML, Markdown",
+      "Ensure highlighting doesn't break on partial lines (additions/deletions may be incomplete)",
+      "Test with various file types to ensure correct coloring"
+    ],
+    "passes": false
+  },
+  {
+    "id": "019-dark-light-theme",
+    "category": "ui",
+    "description": "Implement dark and light theme toggle matching GitHub's theme",
+    "steps": [
+      "Define CSS custom properties for both light and dark themes",
+      "Light theme: white background, dark text, GitHub-classic diff colors",
+      "Dark theme: #0d1117 background, #e6edf3 text, dark-mode diff colors (#1a4721 additions, #67060c deletions)",
+      "Add theme toggle button in the header (sun/moon icon)",
+      "Persist theme preference in settings",
+      "Apply theme class to the root element",
+      "Verify all components render correctly in both themes"
+    ],
+    "passes": false
+  },
+  {
+    "id": "020-open-folder-integration",
+    "category": "functional",
+    "description": "Implement folder opening via file dialog and drag-and-drop",
+    "steps": [
+      "Use Tauri dialog plugin to open a native folder picker",
+      "After folder is selected, validate it's a git repository",
+      "If not a git repo, show an error message suggesting to initialize one",
+      "Support drag-and-drop a folder onto the app window to open it",
+      "Update the header to show the current folder name and path",
+      "Remember last opened folder and offer to reopen on next launch",
+      "Support opening via CLI argument: `aiffer /path/to/repo`"
+    ],
+    "passes": false
+  },
+  {
+    "id": "021-error-handling-polish",
+    "category": "functional",
+    "description": "Add comprehensive error handling and loading states throughout the app",
+    "steps": [
+      "Add loading skeletons for diff viewer while data is loading",
+      "Add empty state when no diffs are found ('No changes detected' with icon)",
+      "Add error boundary at the app level that catches and displays unhandled errors",
+      "Add toast/notification system for non-blocking messages (e.g., 'Settings saved', 'Comment added')",
+      "Handle git errors: not a repo, corrupted repo, permission denied",
+      "Handle network errors for AI API calls with clear user feedback",
+      "Ensure all error messages are actionable (tell user what to do)"
+    ],
+    "passes": false
+  },
+  {
+    "id": "022-e2e-smoke-test",
+    "category": "test",
+    "description": "Create end-to-end smoke tests for core user flow",
+    "steps": [
+      "Set up a test git repo fixture with known file changes",
+      "Test: app launches and displays diff viewer",
+      "Test: changing a file and refreshing shows the diff correctly",
+      "Test: clicking a diff line opens comment form",
+      "Test: submitting a comment shows it in the thread and review summary",
+      "Test: clicking 'Submit Review' collects all comments (mock AI response)",
+      "Document how to run tests in CLAUDE.md"
+    ],
+    "passes": false
+  }
+]
