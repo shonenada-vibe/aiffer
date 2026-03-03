@@ -1,3 +1,4 @@
+use crate::ai::{self, AiConfig};
 use crate::git;
 use crate::models::{
     CommentInput, CommentWithContext, DiffFile, DiffLine, FileEntry, FileSummary, ReviewPayload,
@@ -8,6 +9,8 @@ use crate::models::{
 pub enum CommandError {
     #[error("{0}")]
     Git(#[from] git::GitError),
+    #[error("{0}")]
+    Ai(#[from] ai::AiError),
 }
 
 // Tauri requires command errors to implement Serialize.
@@ -201,6 +204,16 @@ fn format_review_text(
     }
 
     out
+}
+
+/// Submit a review to an AI agent and return its response.
+#[tauri::command]
+pub async fn submit_review(
+    review_text: String,
+    config: AiConfig,
+) -> Result<String, CommandError> {
+    let response = ai::submit_review(&config, &review_text).await?;
+    Ok(response)
 }
 
 /// Get a lightweight list of changed files with statuses.

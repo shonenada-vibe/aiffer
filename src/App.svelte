@@ -1,5 +1,6 @@
 <script lang="ts">
   import { open } from "@tauri-apps/plugin-dialog";
+  import { invoke } from "@tauri-apps/api/core";
   import Header from "./lib/components/Header.svelte";
   import Sidebar from "./lib/components/Sidebar.svelte";
   import DiffContent from "./lib/components/DiffContent.svelte";
@@ -8,10 +9,14 @@
   import { diffStore } from "./lib/stores/diff.svelte";
   import { commentStore } from "./lib/stores/comments.svelte";
   import type { DiffLine } from "./lib/types/diff";
+  import type { CommentInput, ReviewPayload } from "./lib/types/comment";
 
   let sidebarWidth = $state(250);
   let aiPanelOpen = $state(false);
   let reviewPanelOpen = $state(false);
+  let aiResponse = $state("");
+  let aiLoading = $state(false);
+  let aiError: string | null = $state(null);
 
   async function handleOpenFolder() {
     const selected = await open({
@@ -28,10 +33,45 @@
     reviewPanelOpen = !reviewPanelOpen;
   }
 
-  function handleSubmitToAi() {
-    // Placeholder — will be implemented in task 013
+  async function handleSubmitToAi() {
     reviewPanelOpen = false;
     aiPanelOpen = true;
+    aiLoading = true;
+    aiError = null;
+    aiResponse = "";
+
+    try {
+      // Build the review payload with code context
+      const comments: CommentInput[] = commentStore.allComments.map((c) => ({
+        filePath: c.filePath,
+        lineNumber: c.lineNumber,
+        lineType: c.lineType,
+        body: c.body,
+      }));
+
+      const payload = await invoke<ReviewPayload>("build_review_payload", {
+        path: diffStore.folderPath,
+        comments,
+      });
+
+      // TODO: Read AI config from settings (task 015). For now use defaults.
+      const config = {
+        endpoint: "https://api.openai.com/v1",
+        apiKey: "",
+        model: "gpt-4o",
+      };
+
+      const response = await invoke<string>("submit_review", {
+        reviewText: payload.formattedText,
+        config,
+      });
+
+      aiResponse = response;
+    } catch (err) {
+      aiError = err instanceof Error ? err.message : String(err);
+    } finally {
+      aiLoading = false;
+    }
   }
 
   async function handleRefresh() {
@@ -92,6 +132,13 @@
       onSubmitToAi={handleSubmitToAi}
     />
 
-    <AiPanel isOpen={aiPanelOpen} onClose={() => (aiPanelOpen = false)} />
+    <AiPanel
+      isOpen={aiPanelOpen}
+      loading={aiLoading}
+      response={aiResponse}
+      error={aiError}
+      onClose={() => (aiPanelOpen = false)}
+      onRetry={handleSubmitToAi}
+    />
   </div>
 </div>

@@ -44,3 +44,10 @@ export interface ReviewPayload {
   totalDeletions: number;
   formattedText: string;
 }
+
+/** Configuration for the AI API connection. */
+export interface AiConfig {
+  endpoint: string;
+  apiKey: string;
+  model: string;
+}

@@ -192,7 +192,7 @@
       "Handle streaming responses if possible, otherwise return full response",
       "Handle API errors gracefully with user-friendly messages"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "014-ai-response-panel",
