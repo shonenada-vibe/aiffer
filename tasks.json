@@ -147,7 +147,7 @@
       "Comments collapse by default if there are more than 3; show 'Show N more' link",
       "Style to match GitHub comment cards: border-left accent, subtle background"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "011-review-summary-panel",

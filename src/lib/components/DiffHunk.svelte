@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { DiffHunk, DiffLine } from "../types/diff";
+  import { commentStore } from "../stores/comments.svelte";
   import DiffLineRow from "./DiffLine.svelte";
   import CommentForm from "./CommentForm.svelte";
+  import CommentThread from "./CommentThread.svelte";
 
   interface Props {
     hunk: DiffHunk;
@@ -28,6 +30,10 @@
   function lineKey(line: DiffLine): string {
     return `${filePath}:${line.oldLineno ?? ""}:${line.newLineno ?? ""}`;
   }
+
+  function lineNumber(line: DiffLine): number {
+    return line.newLineno ?? line.oldLineno ?? 0;
+  }
 </script>
 
 <!-- Hunk header -->
@@ -42,13 +48,19 @@
 <!-- Hunk lines -->
 {#each hunk.lines as line, i (i)}
   {@const key = lineKey(line)}
+  {@const lineNo = lineNumber(line)}
+  {@const lineComments = commentStore.getCommentsForLine(filePath, lineNo)}
   <DiffLineRow
     {line}
     {filePath}
     highlighted={highlightedLineKey === key}
+    commentCount={lineComments.length}
     {onClickLine}
     {onClickComment}
   />
+  {#if lineComments.length > 0}
+    <CommentThread comments={lineComments} />
+  {/if}
   {#if activeCommentKey === key}
     <CommentForm
       onSubmit={(body) => onSubmitComment(filePath, line, body)}

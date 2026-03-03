@@ -5,12 +5,19 @@
     line: DiffLine;
     filePath: string;
     highlighted: boolean;
+    commentCount: number;
     onClickLine: (filePath: string, line: DiffLine) => void;
     onClickComment: (filePath: string, line: DiffLine) => void;
   }
 
-  let { line, filePath, highlighted, onClickLine, onClickComment }: Props =
-    $props();
+  let {
+    line,
+    filePath,
+    highlighted,
+    commentCount,
+    onClickLine,
+    onClickComment,
+  }: Props = $props();
 
   let bgClass = $derived(
     highlighted
@@ -62,28 +69,45 @@
 </script>
 
 <tr class="group leading-5 {bgClass} {hoverBgClass}">
-  <!-- Comment trigger button (appears on hover) -->
+  <!-- Comment trigger button (appears on hover) / Comment count badge -->
   <td
     class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 {gutterBgClass} relative"
   >
-    <button
-      class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
-      onclick={(e) => {
-        e.stopPropagation();
-        onClickComment(filePath, line);
-      }}
-      title="Add comment on line {lineNo}"
-    >
-      <svg
-        class="h-3.5 w-3.5 rounded bg-blue-500 p-0.5 text-white"
-        viewBox="0 0 16 16"
-        fill="currentColor"
+    {#if commentCount > 0}
+      <button
+        class="absolute inset-0 z-[1] flex items-center justify-center"
+        onclick={(e) => {
+          e.stopPropagation();
+          onClickComment(filePath, line);
+        }}
+        title="{commentCount} comment{commentCount !== 1 ? 's' : ''} on line {lineNo}"
       >
-        <path
-          d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"
-        />
-      </svg>
-    </button>
+        <span
+          class="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-500 px-1 text-[10px] font-bold leading-none text-white"
+        >
+          {commentCount}
+        </span>
+      </button>
+    {:else}
+      <button
+        class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
+        onclick={(e) => {
+          e.stopPropagation();
+          onClickComment(filePath, line);
+        }}
+        title="Add comment on line {lineNo}"
+      >
+        <svg
+          class="h-3.5 w-3.5 rounded bg-blue-500 p-0.5 text-white"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+        >
+          <path
+            d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"
+          />
+        </svg>
+      </button>
+    {/if}
     <!-- Old line number -->
     <span
       class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 group-hover:text-gray-600"
