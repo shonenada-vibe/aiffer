@@ -222,7 +222,7 @@
       "Add a gear icon in the header that opens settings",
       "Validate API key format and endpoint URL before saving"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "016-diff-type-toggle",

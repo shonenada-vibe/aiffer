@@ -6,17 +6,25 @@
   import DiffContent from "./lib/components/DiffContent.svelte";
   import AiPanel from "./lib/components/AiPanel.svelte";
   import ReviewSummary from "./lib/components/ReviewSummary.svelte";
+  import Settings from "./lib/components/Settings.svelte";
   import { diffStore } from "./lib/stores/diff.svelte";
   import { commentStore } from "./lib/stores/comments.svelte";
+  import { settingsStore } from "./lib/stores/settings.svelte";
   import type { DiffLine } from "./lib/types/diff";
   import type { CommentInput, ReviewPayload } from "./lib/types/comment";
 
   let sidebarWidth = $state(250);
   let aiPanelOpen = $state(false);
   let reviewPanelOpen = $state(false);
+  let settingsOpen = $state(false);
   let aiResponse = $state("");
   let aiLoading = $state(false);
   let aiError: string | null = $state(null);
+
+  // Load settings on mount
+  $effect(() => {
+    settingsStore.load();
+  });
 
   async function handleOpenFolder() {
     const selected = await open({
@@ -54,11 +62,11 @@
         comments,
       });
 
-      // TODO: Read AI config from settings (task 015). For now use defaults.
+      const s = settingsStore.settings;
       const config = {
-        endpoint: "https://api.openai.com/v1",
-        apiKey: "",
-        model: "gpt-4o",
+        endpoint: s.aiEndpoint,
+        apiKey: s.aiApiKey,
+        model: s.aiModel,
       };
 
       const response = await invoke<string>("submit_review", {
@@ -99,7 +107,7 @@
     onSubmitReview={handleSubmitReview}
     onOpenFolder={handleOpenFolder}
     onToggleAiPanel={() => (aiPanelOpen = !aiPanelOpen)}
-    onToggleSettings={() => {}}
+    onToggleSettings={() => (settingsOpen = !settingsOpen)}
     onRefresh={handleRefresh}
   />
 
@@ -142,3 +150,5 @@
     />
   </div>
 </div>
+
+<Settings isOpen={settingsOpen} onClose={() => (settingsOpen = false)} />

@@ -109,3 +109,40 @@ pub struct ReviewPayload {
     pub total_deletions: usize,
     pub formatted_text: String,
 }
+
+/// Application settings persisted to disk.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppSettings {
+    #[serde(default = "default_endpoint")]
+    pub ai_endpoint: String,
+    #[serde(default)]
+    pub ai_api_key: String,
+    #[serde(default = "default_model")]
+    pub ai_model: String,
+    #[serde(default = "default_diff_type")]
+    pub diff_type: String,
+}
+
+fn default_endpoint() -> String {
+    "https://api.openai.com/v1".to_string()
+}
+
+fn default_model() -> String {
+    "gpt-4o".to_string()
+}
+
+fn default_diff_type() -> String {
+    "unstaged".to_string()
+}
+
+impl Default for AppSettings {
+    fn default() -> Self {
+        Self {
+            ai_endpoint: default_endpoint(),
+            ai_api_key: String::new(),
+            ai_model: default_model(),
+            diff_type: default_diff_type(),
+        }
+    }
+}

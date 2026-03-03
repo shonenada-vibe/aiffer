@@ -1,8 +1,11 @@
 use crate::ai::{self, AiConfig};
 use crate::git;
 use crate::models::{
-    CommentInput, CommentWithContext, DiffFile, DiffLine, FileEntry, FileSummary, ReviewPayload,
+    AppSettings, CommentInput, CommentWithContext, DiffFile, DiffLine, FileEntry, FileSummary,
+    ReviewPayload,
 };
+use std::fs;
+use std::path::PathBuf;
 
 /// Error type for Tauri commands — wraps git errors into user-friendly strings.
 #[derive(Debug, thiserror::Error)]
@@ -11,6 +14,10 @@ pub enum CommandError {
     Git(#[from] git::GitError),
     #[error("{0}")]
     Ai(#[from] ai::AiError),
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
 }
 
 // Tauri requires command errors to implement Serialize.
@@ -236,6 +243,38 @@ pub fn get_file_status(path: String) -> Result<Vec<FileEntry>, CommandError> {
 
     entries.sort_by(|a, b| a.path.cmp(&b.path));
     Ok(entries)
+}
+
+/// Get the path to the settings file.
+fn settings_path() -> PathBuf {
+    let config_dir = dirs::config_dir()
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join("aiffer");
+    config_dir.join("settings.json")
+}
+
+/// Load application settings from disk.
+#[tauri::command]
+pub fn load_settings() -> Result<AppSettings, CommandError> {
+    let path = settings_path();
+    if !path.exists() {
+        return Ok(AppSettings::default());
+    }
+    let content = fs::read_to_string(&path)?;
+    let settings: AppSettings = serde_json::from_str(&content)?;
+    Ok(settings)
+}
+
+/// Save application settings to disk.
+#[tauri::command]
+pub fn save_settings(settings: AppSettings) -> Result<(), CommandError> {
+    let path = settings_path();
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    let content = serde_json::to_string_pretty(&settings)?;
+    fs::write(&path, content)?;
+    Ok(())
 }
 
 #[cfg(test)]
