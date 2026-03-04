@@ -48,7 +48,8 @@
           >
             {#if copied}
               <svg
-                class="h-4 w-4 text-green-500"
+                class="h-4 w-4"
+                style="color: var(--success-fg);"
                 viewBox="0 0 16 16"
                 fill="currentColor"
               >
@@ -94,7 +95,7 @@
           class="flex flex-col items-center justify-center py-12 text-[var(--panel-muted-fg)]"
         >
           <div
-            class="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-[var(--panel-border)] border-t-blue-500"
+            class="ai-spinner mb-3 h-8 w-8 animate-spin rounded-full border-2"
           ></div>
           <span class="text-sm">Waiting for AI response...</span>
           <span class="mt-1 text-xs text-[var(--panel-faint-fg)]"
@@ -104,19 +105,21 @@
       {:else if error}
         <!-- Error state -->
         <div
-          class="flex flex-col items-center justify-center py-12 text-red-400"
+          class="flex flex-col items-center justify-center py-12"
+          style="color: var(--danger-fg);"
         >
           <svg class="mb-3 h-8 w-8" viewBox="0 0 16 16" fill="currentColor">
             <path
               d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"
             />
           </svg>
-          <p class="mb-1 text-sm font-medium text-red-600">
+          <p class="mb-1 text-sm font-medium">
             AI request failed
           </p>
-          <p class="mb-3 text-center text-xs text-red-500">{error}</p>
+          <p class="mb-3 text-center text-xs" style="opacity: 0.8;">{error}</p>
           <button
-            class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-white"
+            style="background-color: var(--btn-danger-bg);"
             onclick={onRetry}
           >
             Retry
@@ -125,7 +128,7 @@
       {:else if response}
         <!-- Rendered markdown response -->
         <div
-          class="prose prose-sm max-w-none text-[var(--app-fg)] prose-headings:text-[var(--app-fg)] prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:leading-relaxed prose-code:rounded prose-code:bg-[var(--panel-border-subtle)] prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:text-[var(--app-fg)] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#161b22] prose-pre:text-[#e6edf3]"
+          class="prose prose-sm max-w-none text-[var(--app-fg)] prose-headings:text-[var(--app-fg)] prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:leading-relaxed prose-code:rounded prose-code:bg-[var(--panel-border-subtle)] prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:text-[var(--app-fg)] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[var(--panel-muted-bg)] prose-pre:text-[var(--app-fg)]"
         >
           {@html renderedHtml}
         </div>
@@ -145,3 +148,10 @@
     </div>
   </aside>
 {/if}
+
+<style>
+  .ai-spinner {
+    border-color: var(--panel-border);
+    border-top-color: var(--accent-fg);
+  }
+</style>

@@ -281,7 +281,7 @@
       "Apply theme class to the root element",
       "Verify all components render correctly in both themes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "020-open-folder-integration",

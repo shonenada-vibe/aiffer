@@ -64,7 +64,8 @@
   <div class="flex items-center gap-3">
     <div class="flex items-center gap-2">
       <svg
-        class="h-6 w-6 text-blue-400"
+        class="h-6 w-6"
+        style="color: var(--accent-fg);"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -104,7 +105,7 @@
   <!-- Center section: diff type selector -->
   <div class="flex items-center gap-2">
     <select
-      class="rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:border-blue-500 focus:outline-none"
+      class="rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:outline-none"
       value={diffType}
       onchange={(e) =>
         onDiffTypeChange(
@@ -118,7 +119,7 @@
 
     {#if diffType === "commits"}
       <select
-        class="max-w-48 rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:border-blue-500 focus:outline-none"
+        class="max-w-48 rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:outline-none"
         value={fromRef ?? ""}
         onchange={(e) =>
           onFromRefChange((e.target as HTMLSelectElement).value)}
@@ -132,7 +133,7 @@
       <span class="text-xs text-[var(--header-muted-fg)]">→</span>
 
       <select
-        class="max-w-48 rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:border-blue-500 focus:outline-none"
+        class="max-w-48 rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:outline-none"
         value={toRef ?? ""}
         onchange={(e) =>
           onToRefChange((e.target as HTMLSelectElement).value)}
@@ -209,7 +210,10 @@
 
     <button
       onclick={onSubmitReview}
-      class="flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700"
+      class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-white"
+      style="background-color: var(--btn-primary-bg);"
+      onmouseenter={(e) => (e.currentTarget.style.backgroundColor = 'var(--btn-primary-hover-bg)')}
+      onmouseleave={(e) => (e.currentTarget.style.backgroundColor = 'var(--btn-primary-bg)')}
     >
       <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
         <path

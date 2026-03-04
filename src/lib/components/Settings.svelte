@@ -66,7 +66,8 @@
   <!-- Backdrop -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    style="background-color: var(--overlay-bg);"
     onclick={(e) => {
       if (e.target === e.currentTarget) onClose();
     }}
@@ -115,7 +116,7 @@
                 type="url"
                 bind:value={endpoint}
                 placeholder="https://api.openai.com/v1"
-                class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:outline-none"
               />
               <p class="mt-0.5 text-[11px] text-[var(--panel-faint-fg)]">
                 Any OpenAI-compatible API endpoint
@@ -134,7 +135,7 @@
                   type={showApiKey ? "text" : "password"}
                   bind:value={apiKey}
                   placeholder="sk-..."
-                  class="flex-1 rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  class="flex-1 rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:outline-none"
                 />
                 <button
                   type="button"
@@ -157,7 +158,7 @@
                 type="text"
                 bind:value={model}
                 placeholder="gpt-4o"
-                class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:outline-none"
               />
             </div>
           </div>
@@ -177,7 +178,7 @@
             <select
               id="theme"
               bind:value={theme}
-              class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] focus:outline-none"
             >
               <option value="light">Light</option>
               <option value="dark">Dark</option>
@@ -199,7 +200,7 @@
             <select
               id="diff-type"
               bind:value={diffType}
-              class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] focus:outline-none"
             >
               <option value="unstaged">Unstaged Changes</option>
               <option value="staged">Staged Changes</option>
@@ -208,7 +209,7 @@
         </div>
 
         {#if validationError}
-          <p class="text-sm text-red-600">{validationError}</p>
+          <p class="text-sm" style="color: var(--danger-fg);">{validationError}</p>
         {/if}
       </div>
 
@@ -225,7 +226,8 @@
         <button
           onclick={handleSave}
           disabled={saving}
-          class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          class="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          style="background-color: var(--accent-fg);"
         >
           {saving ? "Saving..." : "Save"}
         </button>

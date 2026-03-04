@@ -24,43 +24,7 @@
 
   let highlightedContent = $derived(highlightLine(line.content, language));
 
-  let bgClass = $derived(
-    highlighted
-      ? "bg-yellow-100 dark:bg-[#bb800926]"
-      : line.lineType === "addition"
-        ? "bg-green-50 dark:bg-[#1a4721]"
-        : line.lineType === "deletion"
-          ? "bg-red-50 dark:bg-[#67060c]"
-          : "",
-  );
-
-  let hoverBgClass = $derived(
-    highlighted
-      ? ""
-      : line.lineType === "addition"
-        ? "hover:bg-green-100/60 dark:hover:bg-[#1a4721]/80"
-        : line.lineType === "deletion"
-          ? "hover:bg-red-100/60 dark:hover:bg-[#67060c]/80"
-          : "hover:bg-gray-50 dark:hover:bg-[#161b22]",
-  );
-
-  let gutterBgClass = $derived(
-    highlighted
-      ? "bg-yellow-200 dark:bg-[#bb800940]"
-      : line.lineType === "addition"
-        ? "bg-green-100 dark:bg-[#1a4721]/60"
-        : line.lineType === "deletion"
-          ? "bg-red-100 dark:bg-[#67060c]/60"
-          : "bg-gray-50 dark:bg-[#161b22]",
-  );
-
-  let textClass = $derived(
-    line.lineType === "addition"
-      ? "text-green-800 dark:text-[#3fb950]"
-      : line.lineType === "deletion"
-        ? "text-red-800 dark:text-[#f85149]"
-        : "text-gray-800 dark:text-[#e6edf3]",
-  );
+  let lineNo = $derived(line.newLineno ?? line.oldLineno ?? 0);
 
   let prefix = $derived(
     line.lineType === "addition"
@@ -69,17 +33,19 @@
         ? "-"
         : " ",
   );
-
-  let lineNo = $derived(line.newLineno ?? line.oldLineno ?? 0);
 </script>
 
 <tr
-  class="group leading-5 {bgClass} {hoverBgClass}"
+  class="group leading-5 diff-line"
+  class:diff-line-add={!highlighted && line.lineType === "addition"}
+  class:diff-line-del={!highlighted && line.lineType === "deletion"}
+  class:diff-line-highlight={highlighted}
+  class:diff-line-ctx={!highlighted && line.lineType !== "addition" && line.lineType !== "deletion"}
   data-line-highlighted={highlighted ? "" : undefined}
 >
   <!-- Comment trigger button (appears on hover) / Comment count badge -->
   <td
-    class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 dark:border-[#30363d] {gutterBgClass} relative"
+    class="diff-gutter w-[1px] select-none whitespace-nowrap relative"
   >
     {#if commentCount > 0}
       <button
@@ -91,7 +57,7 @@
         title="{commentCount} comment{commentCount !== 1 ? 's' : ''} on line {lineNo}"
       >
         <span
-          class="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-500 px-1 text-[10px] font-bold leading-none text-white"
+          class="diff-comment-badge flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold leading-none text-white"
         >
           {commentCount}
         </span>
@@ -107,7 +73,7 @@
         title="Add comment on line {lineNo}"
       >
         <svg
-          class="h-3.5 w-3.5 rounded bg-blue-500 p-0.5 text-white"
+          class="diff-comment-trigger h-3.5 w-3.5 rounded p-0.5 text-white"
           viewBox="0 0 16 16"
           fill="currentColor"
         >
@@ -119,7 +85,7 @@
     {/if}
     <!-- Old line number -->
     <span
-      class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 dark:text-[#8b949e] group-hover:text-gray-600 dark:group-hover:text-[#e6edf3]"
+      class="diff-lineno block cursor-pointer px-2 text-right font-mono text-xs"
       role="button"
       tabindex="-1"
       onclick={() => onClickLine(filePath, line)}
@@ -130,10 +96,10 @@
   </td>
   <!-- New line number -->
   <td
-    class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 dark:border-[#30363d] {gutterBgClass}"
+    class="diff-gutter w-[1px] select-none whitespace-nowrap"
   >
     <span
-      class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 dark:text-[#8b949e] group-hover:text-gray-600 dark:group-hover:text-[#e6edf3]"
+      class="diff-lineno block cursor-pointer px-2 text-right font-mono text-xs"
       role="button"
       tabindex="-1"
       onclick={() => onClickLine(filePath, line)}
@@ -144,13 +110,13 @@
   </td>
   <!-- Prefix (+/-/space) -->
   <td
-    class="w-[1px] select-none whitespace-nowrap pl-2 pr-0 text-center align-top font-mono text-xs {textClass}"
+    class="diff-text w-[1px] select-none whitespace-nowrap pl-2 pr-0 text-center align-top font-mono text-xs"
   >
     {prefix}
   </td>
   <!-- Content -->
   <td
-    class="hljs whitespace-pre-wrap break-all pr-4 align-top font-mono text-xs {textClass}"
+    class="hljs diff-text whitespace-pre-wrap break-all pr-4 align-top font-mono text-xs"
   >
     {#if language}
       {@html highlightedContent || "&nbsp;"}
@@ -159,3 +125,64 @@
     {/if}
   </td>
 </tr>
+
+<style>
+  .diff-line {
+    --line-bg: transparent;
+    --line-hover-bg: var(--panel-muted-bg);
+    --line-gutter-bg: var(--gutter-bg);
+    --line-text-color: var(--app-fg);
+  }
+  .diff-line-add {
+    --line-bg: var(--diff-add-bg);
+    --line-hover-bg: var(--diff-add-hover-bg);
+    --line-gutter-bg: var(--diff-add-gutter-bg);
+    --line-text-color: var(--diff-add-fg);
+  }
+  .diff-line-del {
+    --line-bg: var(--diff-del-bg);
+    --line-hover-bg: var(--diff-del-hover-bg);
+    --line-gutter-bg: var(--diff-del-gutter-bg);
+    --line-text-color: var(--diff-del-fg);
+  }
+  .diff-line-highlight {
+    --line-bg: var(--diff-highlight-bg);
+    --line-hover-bg: var(--diff-highlight-bg);
+    --line-gutter-bg: var(--diff-highlight-gutter-bg);
+    --line-text-color: var(--app-fg);
+  }
+  .diff-line-ctx {
+    --line-bg: transparent;
+    --line-hover-bg: var(--panel-muted-bg);
+    --line-gutter-bg: var(--gutter-bg);
+    --line-text-color: var(--app-fg);
+  }
+  .diff-line {
+    background-color: var(--line-bg);
+  }
+  .diff-line:hover {
+    background-color: var(--line-hover-bg);
+  }
+  .diff-line-highlight:hover {
+    background-color: var(--diff-highlight-bg);
+  }
+  .diff-gutter {
+    background-color: var(--line-gutter-bg);
+    border-right: 1px solid var(--gutter-border);
+  }
+  .diff-lineno {
+    color: var(--gutter-fg);
+  }
+  .diff-line:hover .diff-lineno {
+    color: var(--gutter-hover-fg);
+  }
+  .diff-text {
+    color: var(--line-text-color);
+  }
+  .diff-comment-badge {
+    background-color: var(--accent-fg);
+  }
+  .diff-comment-trigger {
+    background-color: var(--accent-fg);
+  }
+</style>

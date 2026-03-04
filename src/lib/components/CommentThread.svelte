@@ -68,20 +68,16 @@
 </script>
 
 <tr>
-  <td colspan="4" class="border-b border-gray-200 dark:border-[#30363d] p-0">
+  <td colspan="4" class="comment-thread-cell p-0">
     <div class="mx-4 my-1 space-y-1">
       {#each visibleComments as comment (comment.id)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div
-          class="group/comment rounded-r border-l-2 border-blue-400 dark:border-[#58a6ff] bg-gray-50 dark:bg-[#161b22]"
-        >
+        <div class="group/comment comment-card rounded-r">
           <div class="flex items-start gap-2 px-3 py-2">
             <!-- Avatar placeholder -->
-            <div
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-[#30363d]"
-            >
+            <div class="comment-avatar flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
               <svg
-                class="h-3.5 w-3.5 text-gray-500 dark:text-[#8b949e]"
+                class="comment-avatar-icon h-3.5 w-3.5"
                 viewBox="0 0 16 16"
                 fill="currentColor"
               >
@@ -94,17 +90,15 @@
             <div class="min-w-0 flex-1">
               <!-- Header: name + time -->
               <div class="flex items-center gap-2 text-xs">
-                <span class="font-medium text-gray-700 dark:text-[#e6edf3]">You</span>
-                <span class="text-gray-400 dark:text-[#8b949e]"
-                  >{formatTime(comment.createdAt)}</span
-                >
+                <span class="comment-author font-medium">You</span>
+                <span class="comment-time">{formatTime(comment.createdAt)}</span>
               </div>
 
               {#if editingId === comment.id}
                 <!-- Edit mode -->
                 <textarea
                   bind:value={editBody}
-                  class="mt-1 w-full resize-y rounded border border-gray-200 dark:border-[#30363d] bg-white dark:bg-[#0d1117] px-2 py-1 text-sm text-gray-800 dark:text-[#e6edf3] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  class="comment-edit-textarea mt-1 w-full resize-y rounded px-2 py-1 text-sm focus:outline-none focus:ring-1"
                   rows="2"
                   onkeydown={(e) => {
                     if (e.key === "Escape") cancelEdit();
@@ -114,13 +108,13 @@
                 ></textarea>
                 <div class="mt-1 flex gap-1">
                   <button
-                    class="rounded bg-green-600 px-2 py-0.5 text-xs text-white hover:bg-green-700"
+                    class="comment-save-btn rounded px-2 py-0.5 text-xs text-white"
                     onclick={saveEdit}
                   >
                     Save
                   </button>
                   <button
-                    class="rounded px-2 py-0.5 text-xs text-gray-600 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d]"
+                    class="comment-cancel-btn rounded px-2 py-0.5 text-xs"
                     onclick={cancelEdit}
                   >
                     Cancel
@@ -128,7 +122,7 @@
                 </div>
               {:else}
                 <!-- Display mode -->
-                <p class="mt-0.5 whitespace-pre-wrap text-sm text-gray-800 dark:text-[#e6edf3]">
+                <p class="comment-body mt-0.5 whitespace-pre-wrap text-sm">
                   {comment.body}
                 </p>
               {/if}
@@ -139,13 +133,13 @@
               {#if deletingId === comment.id}
                 <div class="flex shrink-0 items-center gap-1">
                   <button
-                    class="rounded bg-red-600 px-2 py-0.5 text-xs text-white hover:bg-red-700"
+                    class="comment-delete-confirm rounded px-2 py-0.5 text-xs text-white"
                     onclick={executeDelete}
                   >
                     Delete
                   </button>
                   <button
-                    class="rounded px-2 py-0.5 text-xs text-gray-600 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d]"
+                    class="comment-cancel-btn rounded px-2 py-0.5 text-xs"
                     onclick={cancelDelete}
                   >
                     Cancel
@@ -156,7 +150,7 @@
                   class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover/comment:opacity-100"
                 >
                   <button
-                    class="rounded p-1 text-gray-400 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d] hover:text-gray-600 dark:hover:text-[#e6edf3]"
+                    class="comment-action-btn rounded p-1"
                     title="Edit"
                     onclick={() => startEdit(comment)}
                   >
@@ -171,7 +165,7 @@
                     </svg>
                   </button>
                   <button
-                    class="rounded p-1 text-gray-400 dark:text-[#8b949e] hover:bg-red-50 dark:hover:bg-[#67060c] hover:text-red-600 dark:hover:text-[#f85149]"
+                    class="comment-action-btn-danger rounded p-1"
                     title="Delete"
                     onclick={() => confirmDelete(comment.id)}
                   >
@@ -194,7 +188,7 @@
 
       {#if hiddenCount > 0}
         <button
-          class="w-full rounded py-1 text-center text-xs text-blue-500 dark:text-[#58a6ff] hover:bg-blue-50 dark:hover:bg-[#1f6feb]/15 hover:text-blue-700 dark:hover:text-[#79c0ff]"
+          class="comment-show-more w-full rounded py-1 text-center text-xs"
           onclick={() => (showAll = true)}
         >
           Show {hiddenCount} more comment{hiddenCount !== 1 ? "s" : ""}
@@ -203,3 +197,74 @@
     </div>
   </td>
 </tr>
+
+<style>
+  .comment-thread-cell {
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .comment-card {
+    border-left: 2px solid var(--accent-fg);
+    background-color: var(--panel-muted-bg);
+  }
+  .comment-avatar {
+    background-color: var(--panel-border);
+  }
+  .comment-avatar-icon {
+    color: var(--panel-muted-fg);
+  }
+  .comment-author {
+    color: var(--app-fg);
+  }
+  .comment-time {
+    color: var(--panel-faint-fg);
+  }
+  .comment-body {
+    color: var(--app-fg);
+  }
+  .comment-edit-textarea {
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--app-fg);
+  }
+  .comment-edit-textarea:focus {
+    border-color: var(--focus-ring);
+  }
+  .comment-save-btn {
+    background-color: var(--btn-primary-bg);
+  }
+  .comment-save-btn:hover {
+    background-color: var(--btn-primary-hover-bg);
+  }
+  .comment-cancel-btn {
+    color: var(--btn-secondary-fg);
+  }
+  .comment-cancel-btn:hover {
+    background-color: var(--btn-secondary-hover-bg);
+  }
+  .comment-delete-confirm {
+    background-color: var(--btn-danger-bg);
+  }
+  .comment-delete-confirm:hover {
+    background-color: var(--btn-danger-hover-bg);
+  }
+  .comment-action-btn {
+    color: var(--panel-faint-fg);
+  }
+  .comment-action-btn:hover {
+    background-color: var(--btn-secondary-hover-bg);
+    color: var(--app-fg);
+  }
+  .comment-action-btn-danger {
+    color: var(--panel-faint-fg);
+  }
+  .comment-action-btn-danger:hover {
+    background-color: var(--danger-muted-bg);
+    color: var(--danger-fg);
+  }
+  .comment-show-more {
+    color: var(--accent-fg);
+  }
+  .comment-show-more:hover {
+    background-color: var(--accent-muted-bg);
+  }
+</style>

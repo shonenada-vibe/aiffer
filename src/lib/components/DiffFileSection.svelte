@@ -46,28 +46,28 @@
     return map[status];
   }
 
-  function statusBadgeClass(status: FileStatus): string {
+  function statusBadgeVar(status: FileStatus): string {
     const map: Record<FileStatus, string> = {
-      added: "bg-green-100 text-green-700 dark:bg-[#3fb950]/10 dark:text-[#3fb950]",
-      modified: "bg-yellow-100 text-yellow-700 dark:bg-[#d29922]/10 dark:text-[#d29922]",
-      deleted: "bg-red-100 text-red-700 dark:bg-[#f85149]/10 dark:text-[#f85149]",
-      renamed: "bg-blue-100 text-blue-700 dark:bg-[#58a6ff]/10 dark:text-[#58a6ff]",
-      copied: "bg-blue-100 text-blue-700 dark:bg-[#58a6ff]/10 dark:text-[#58a6ff]",
-      untracked: "bg-gray-100 text-gray-600 dark:bg-[#8b949e]/10 dark:text-[#8b949e]",
+      added: "success",
+      modified: "warning",
+      deleted: "danger",
+      renamed: "info",
+      copied: "info",
+      untracked: "neutral",
     };
     return map[status];
   }
 </script>
 
-<section id="diff-file-{file.path}" class="border-b border-gray-200 dark:border-[#30363d]">
+<section id="diff-file-{file.path}" class="diff-file-section">
   <!-- File header -->
   <button
-    class="sticky top-0 z-[1] flex w-full items-center gap-2 border-b border-gray-200 dark:border-[#30363d] bg-gray-50 dark:bg-[#161b22] px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-[#30363d]"
+    class="diff-file-header sticky top-0 z-[1] flex w-full items-center gap-2 px-4 py-2 text-left"
     onclick={toggle}
   >
     <!-- Collapse chevron -->
     <svg
-      class="h-3.5 w-3.5 shrink-0 text-gray-500 dark:text-[#8b949e] transition-transform {collapsed
+      class="diff-file-icon h-3.5 w-3.5 shrink-0 transition-transform {collapsed
         ? '-rotate-90'
         : ''}"
       viewBox="0 0 16 16"
@@ -80,7 +80,7 @@
 
     <!-- File icon -->
     <svg
-      class="h-4 w-4 shrink-0 text-gray-400 dark:text-[#8b949e]"
+      class="diff-file-icon h-4 w-4 shrink-0"
       viewBox="0 0 16 16"
       fill="currentColor"
     >
@@ -90,16 +90,17 @@
     </svg>
 
     <!-- File path -->
-    <span class="min-w-0 flex-1 truncate font-mono text-sm text-gray-800 dark:text-[#e6edf3]">
+    <span class="diff-file-path min-w-0 flex-1 truncate font-mono text-sm">
       {file.path}
       {#if file.oldPath}
-        <span class="text-gray-400 dark:text-[#8b949e]">(was {file.oldPath})</span>
+        <span class="diff-file-old-path">(was {file.oldPath})</span>
       {/if}
     </span>
 
     <!-- Status badge -->
     <span
-      class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium {statusBadgeClass(file.status)}"
+      class="diff-status-badge shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
+      style="background-color: var(--{statusBadgeVar(file.status)}-muted-bg); color: var(--{statusBadgeVar(file.status)}-fg);"
     >
       {statusLabel(file.status)}
     </span>
@@ -107,10 +108,10 @@
     <!-- Stats -->
     <span class="flex shrink-0 gap-1.5 text-xs">
       {#if file.stats.additions > 0}
-        <span class="font-medium text-green-600 dark:text-[#3fb950]">+{file.stats.additions}</span>
+        <span class="font-medium" style="color: var(--success-fg);">+{file.stats.additions}</span>
       {/if}
       {#if file.stats.deletions > 0}
-        <span class="font-medium text-red-600 dark:text-[#f85149]">-{file.stats.deletions}</span>
+        <span class="font-medium" style="color: var(--danger-fg);">-{file.stats.deletions}</span>
       {/if}
     </span>
   </button>
@@ -138,3 +139,25 @@
     </div>
   {/if}
 </section>
+
+<style>
+  .diff-file-section {
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .diff-file-header {
+    background-color: var(--panel-muted-bg);
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .diff-file-header:hover {
+    background-color: var(--header-hover-bg);
+  }
+  .diff-file-icon {
+    color: var(--panel-faint-fg);
+  }
+  .diff-file-path {
+    color: var(--app-fg);
+  }
+  .diff-file-old-path {
+    color: var(--panel-faint-fg);
+  }
+</style>

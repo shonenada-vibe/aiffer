@@ -76,7 +76,8 @@
         </span>
         {#if commentStore.commentCount > 0}
           <span
-            class="rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium leading-none text-blue-700"
+            class="rounded-full px-1.5 py-0.5 text-xs font-medium leading-none"
+            style="background-color: var(--accent-muted-bg); color: var(--accent-fg);"
           >
             {commentStore.commentCount}
           </span>
@@ -144,18 +145,15 @@
                 {#each group.comments as comment (comment.id)}
                   {@const lineContent = getLineContent(comment.filePath, comment.lineNumber)}
                   <button
-                    class="w-full rounded border border-[var(--panel-border)] bg-[var(--panel-muted-bg)] p-2 text-left transition-colors hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-[#0d419d20]"
+                    class="review-comment-card w-full rounded border border-[var(--panel-border)] bg-[var(--panel-muted-bg)] p-2 text-left transition-colors"
                     onclick={() => scrollToComment(comment)}
                     title="Click to scroll to this comment"
                   >
                     <div class="flex items-center gap-2 text-xs text-[var(--panel-muted-fg)]">
                       <span class="font-mono">L{comment.lineNumber}</span>
                       <span
-                        class="rounded px-1 py-0.5 text-[10px] font-medium {comment.lineType === 'addition'
-                          ? 'bg-green-100 text-green-700 dark:bg-[#3fb950]/10 dark:text-[#3fb950]'
-                          : comment.lineType === 'deletion'
-                            ? 'bg-red-100 text-red-700 dark:bg-[#f85149]/10 dark:text-[#f85149]'
-                            : 'bg-gray-100 text-gray-600 dark:bg-[#8b949e]/10 dark:text-[#8b949e]'}"
+                        class="rounded px-1 py-0.5 text-[10px] font-medium"
+                      style="color: var(--{comment.lineType === 'addition' ? 'success' : comment.lineType === 'deletion' ? 'danger' : 'neutral'}-fg); background-color: var(--{comment.lineType === 'addition' ? 'success' : comment.lineType === 'deletion' ? 'danger' : 'neutral'}-muted-bg);"
                       >
                         {comment.lineType === "addition"
                           ? "+"
@@ -192,9 +190,10 @@
       >
         {#if confirmClear}
           <div class="flex items-center gap-2">
-            <span class="text-xs text-red-600">Clear all comments?</span>
+            <span class="text-xs" style="color: var(--danger-fg);">Clear all comments?</span>
             <button
-              class="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
+              class="rounded px-2 py-1 text-xs text-white"
+              style="background-color: var(--btn-danger-bg);"
               onclick={handleClearAll}
             >
               Confirm
@@ -208,7 +207,7 @@
           </div>
         {:else}
           <button
-            class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700"
+            class="review-clear-btn rounded px-2 py-1 text-xs"
             onclick={() => (confirmClear = true)}
           >
             Clear All
@@ -216,7 +215,8 @@
         {/if}
         {#if !confirmClear}
           <button
-            class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-white"
+            style="background-color: var(--btn-primary-bg);"
             onclick={onSubmitToAi}
           >
             Submit to AI
@@ -226,3 +226,16 @@
     {/if}
   </aside>
 {/if}
+
+<style>
+  .review-comment-card:hover {
+    border-color: var(--accent-fg);
+    background-color: var(--accent-muted-bg);
+  }
+  .review-clear-btn {
+    color: var(--danger-fg);
+  }
+  .review-clear-btn:hover {
+    background-color: var(--danger-muted-bg);
+  }
+</style>
