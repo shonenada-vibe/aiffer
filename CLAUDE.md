@@ -123,6 +123,44 @@ In `tasks.json`, change the task's `passes` from `false` to `true`.
 4. **Commit your changes** — Keep git history clean
 5. **Never remove tasks** — Only flip `passes: false` to `true`
 
+## Running Tests
+
+### Rust Backend Tests
+
+```bash
+cd src-tauri
+
+# Run all tests (unit + integration)
+cargo test
+
+# Run only unit tests
+cargo test --lib
+
+# Run only smoke/integration tests
+cargo test --test smoke_test
+
+# Run with output
+cargo test -- --nocapture
+
+# Run a specific test
+cargo test test_modify_file_shows_diff
+```
+
+### Frontend Checks
+
+```bash
+# Type-check Svelte + TypeScript
+bun run check
+
+# Lint Rust
+cd src-tauri && cargo clippy
+```
+
+### Test Coverage
+
+- **Unit tests** (`src-tauri/src/`): Git operations, diff parsing, comment enrichment, review payload formatting
+- **Smoke tests** (`src-tauri/tests/smoke_test.rs`): End-to-end flows covering repo validation, diff reading (unstaged/staged/commits), multi-file changes, review payload building with comments, settings persistence, and error handling
+
 ## Coding Conventions
 
 ### Rust (src-tauri/)

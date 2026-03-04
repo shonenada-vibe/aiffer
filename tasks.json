@@ -326,6 +326,6 @@
       "Test: clicking 'Submit Review' collects all comments (mock AI response)",
       "Document how to run tests in CLAUDE.md"
     ],
-    "passes": false
+    "passes": true
   }
 ]
