@@ -37,7 +37,7 @@
 </script>
 
 <!-- Hunk header -->
-<tr class="bg-blue-50">
+<tr class="bg-blue-50" data-hunk-header>
   <td
     colspan="4"
     class="border-y border-blue-100 px-4 py-1 font-mono text-xs text-blue-700"

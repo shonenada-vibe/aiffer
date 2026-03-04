@@ -252,7 +252,7 @@
       "Add shortcut: '?' = show keyboard shortcut help overlay",
       "Ensure shortcuts don't fire when typing in text inputs"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "018-syntax-highlighting",

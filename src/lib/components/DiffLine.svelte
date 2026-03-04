@@ -68,7 +68,10 @@
   let lineNo = $derived(line.newLineno ?? line.oldLineno ?? 0);
 </script>
 
-<tr class="group leading-5 {bgClass} {hoverBgClass}">
+<tr
+  class="group leading-5 {bgClass} {hoverBgClass}"
+  data-line-highlighted={highlighted ? "" : undefined}
+>
   <!-- Comment trigger button (appears on hover) / Comment count badge -->
   <td
     class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 {gutterBgClass} relative"
@@ -91,6 +94,7 @@
     {:else}
       <button
         class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
+        data-comment-trigger
         onclick={(e) => {
           e.stopPropagation();
           onClickComment(filePath, line);
