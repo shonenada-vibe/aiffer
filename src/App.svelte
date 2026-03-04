@@ -22,11 +22,50 @@
   let aiResponse = $state("");
   let aiLoading = $state(false);
   let aiError: string | null = $state(null);
+  let dragOver = $state(false);
 
-  // Load settings on mount
+  // Load settings on mount, then auto-open last folder or CLI arg
   $effect(() => {
-    settingsStore.load();
+    initApp();
   });
+
+  async function initApp() {
+    await settingsStore.load();
+
+    // Check CLI argument first
+    try {
+      const cliPath = await invoke<string | null>("get_initial_path");
+      if (cliPath) {
+        await tryOpenFolder(cliPath);
+        return;
+      }
+    } catch {
+      // No CLI arg, continue
+    }
+
+    // Otherwise, reopen last folder if available
+    const lastFolder = settingsStore.settings.lastOpenedFolder;
+    if (lastFolder) {
+      await tryOpenFolder(lastFolder);
+    }
+  }
+
+  async function tryOpenFolder(path: string) {
+    try {
+      const canonicalPath = await invoke<string>("validate_git_repo", { path });
+      await diffStore.openFolder(canonicalPath);
+      // Persist as last opened folder
+      await settingsStore.save({
+        ...settingsStore.settings,
+        lastOpenedFolder: canonicalPath,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      diffStore.setError(
+        `Not a git repository: ${path}\n\nPlease open a folder that contains a .git directory, or initialize one with "git init".`,
+      );
+    }
+  }
 
   async function handleOpenFolder() {
     const selected = await open({
@@ -35,7 +74,7 @@
       title: "Open Git Repository",
     });
     if (selected && typeof selected === "string") {
-      await diffStore.openFolder(selected);
+      await tryOpenFolder(selected);
     }
   }
 
@@ -130,6 +169,44 @@
   function handleSubmitComment(filePath: string, line: DiffLine, body: string) {
     const lineNumber = line.newLineno ?? line.oldLineno ?? 0;
     commentStore.addComment(filePath, lineNumber, line.lineType, body);
+  }
+
+  // Drag-and-drop handlers
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = "copy";
+    }
+    dragOver = true;
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    // Only dismiss if leaving the window entirely
+    const related = e.relatedTarget as HTMLElement | null;
+    if (!related || !document.body.contains(related)) {
+      dragOver = false;
+    }
+  }
+
+  async function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    dragOver = false;
+
+    if (!e.dataTransfer) return;
+
+    // Try to get the path from dropped files
+    const items = e.dataTransfer.files;
+    if (items.length > 0) {
+      // Tauri exposes the file path via the File object's webkitRelativePath
+      // or through the dataTransfer items
+      const item = items[0];
+      // On desktop Tauri apps, File.name may contain the path
+      // Use the Tauri file drop event path if available
+      const path = (item as File & { path?: string }).path;
+      if (path) {
+        await tryOpenFolder(path);
+      }
+    }
   }
 
   function isTextInput(el: EventTarget | null): boolean {
@@ -258,7 +335,13 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="flex h-screen flex-col overflow-hidden">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+  class="flex h-screen flex-col overflow-hidden"
+  ondragover={handleDragOver}
+  ondragleave={handleDragLeave}
+  ondrop={handleDrop}
+>
   <Header
     folderPath={diffStore.folderPath}
     commentCount={commentStore.commentCount}
@@ -316,6 +399,19 @@
       onRetry={handleSubmitToAi}
     />
   </div>
+
+  <!-- Drag-and-drop overlay -->
+  {#if dragOver}
+    <div class="drop-overlay fixed inset-0 z-[100] flex items-center justify-center">
+      <div class="drop-overlay-content rounded-2xl border-2 border-dashed px-12 py-8 text-center">
+        <svg class="mx-auto mb-3 h-12 w-12" viewBox="0 0 16 16" fill="currentColor" style="color: var(--accent-fg);">
+          <path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z" />
+        </svg>
+        <p class="text-lg font-medium" style="color: var(--app-fg);">Drop a folder to open</p>
+        <p class="mt-1 text-sm" style="color: var(--panel-muted-fg);">The folder must be a git repository</p>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <Settings isOpen={settingsOpen} onClose={() => (settingsOpen = false)} />
@@ -323,3 +419,13 @@
   isOpen={shortcutHelpOpen}
   onClose={() => (shortcutHelpOpen = false)}
 />
+
+<style>
+  .drop-overlay {
+    background-color: var(--overlay-bg);
+  }
+  .drop-overlay-content {
+    background-color: var(--panel-bg);
+    border-color: var(--accent-fg);
+  }
+</style>

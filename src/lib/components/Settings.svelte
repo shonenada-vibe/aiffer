@@ -50,6 +50,7 @@
         aiModel: model.trim(),
         diffType,
         theme,
+        lastOpenedFolder: settingsStore.settings.lastOpenedFolder,
       };
       await settingsStore.save(settings);
       onClose();

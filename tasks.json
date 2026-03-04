@@ -296,7 +296,7 @@
       "Remember last opened folder and offer to reopen on next launch",
       "Support opening via CLI argument: `aiffer /path/to/repo`"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "021-error-handling-polish",

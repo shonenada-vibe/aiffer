@@ -35,6 +35,54 @@ pub fn greet(name: &str) -> String {
     format!("Hello, {}! Welcome to Aiffer.", name)
 }
 
+/// Validate whether a path is a valid git repository.
+/// Returns Ok(canonical_path) if valid, or an error message if not.
+#[tauri::command]
+pub fn validate_git_repo(path: String) -> Result<String, CommandError> {
+    let p = std::path::Path::new(&path);
+    if !p.exists() {
+        return Err(CommandError::Git(git::GitError::NotARepo(format!(
+            "Path does not exist: {path}"
+        ))));
+    }
+    if !p.is_dir() {
+        return Err(CommandError::Git(git::GitError::NotARepo(format!(
+            "Not a directory: {path}"
+        ))));
+    }
+    let _repo = git::open_repo(&path)?;
+    // Return the canonical path
+    let canonical = p
+        .canonicalize()
+        .unwrap_or_else(|_| p.to_path_buf())
+        .to_string_lossy()
+        .to_string();
+    Ok(canonical)
+}
+
+/// Get the initial folder path from CLI arguments (if provided).
+#[tauri::command]
+pub fn get_initial_path() -> Option<String> {
+    let args: Vec<String> = std::env::args().collect();
+    // Skip the first arg (binary name). The second arg, if present, is the path.
+    if args.len() > 1 {
+        let path = &args[1];
+        // Ignore Tauri internal flags
+        if !path.starts_with('-') {
+            let p = std::path::Path::new(path);
+            if p.exists() && p.is_dir() {
+                return Some(
+                    p.canonicalize()
+                        .unwrap_or_else(|_| p.to_path_buf())
+                        .to_string_lossy()
+                        .to_string(),
+                );
+            }
+        }
+    }
+    None
+}
+
 /// Get the full diff for a repository path.
 /// `diff_type` should be "unstaged", "staged", or "commits".
 /// When `diff_type` is "commits", `from_ref` and `to_ref` must be provided.

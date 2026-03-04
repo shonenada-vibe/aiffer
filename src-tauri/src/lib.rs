@@ -16,6 +16,8 @@ pub fn run() {
             commands::submit_review,
             commands::load_settings,
             commands::save_settings,
+            commands::validate_git_repo,
+            commands::get_initial_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

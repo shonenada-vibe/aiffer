@@ -8,6 +8,7 @@ export interface AppSettings {
   aiModel: string;
   diffType: string;
   theme: Theme;
+  lastOpenedFolder: string;
 }
 
 const defaults: AppSettings = {
@@ -16,6 +17,7 @@ const defaults: AppSettings = {
   aiModel: "gpt-4o",
   diffType: "unstaged",
   theme: "light",
+  lastOpenedFolder: "",
 };
 
 let _settings = $state<AppSettings>({ ...defaults });

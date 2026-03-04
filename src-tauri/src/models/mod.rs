@@ -135,6 +135,8 @@ pub struct AppSettings {
     pub diff_type: String,
     #[serde(default = "default_theme")]
     pub theme: String,
+    #[serde(default)]
+    pub last_opened_folder: String,
 }
 
 fn default_endpoint() -> String {
@@ -161,6 +163,7 @@ impl Default for AppSettings {
             ai_model: default_model(),
             diff_type: default_diff_type(),
             theme: default_theme(),
+            last_opened_folder: String::new(),
         }
     }
 }

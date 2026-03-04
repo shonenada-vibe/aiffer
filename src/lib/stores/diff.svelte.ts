@@ -67,6 +67,10 @@ export const diffStore = {
     _selectedFile = path;
   },
 
+  setError(error: string | null) {
+    _error = error;
+  },
+
   setDiffType(type_: DiffType) {
     _diffType = type_;
   },
