@@ -1,5 +1,12 @@
 @import "tailwindcss";
+@import "highlight.js/styles/github.css";
 @plugin "@tailwindcss/typography";
+
+/* Override hljs background to inherit diff line coloring */
+.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+}
 
 :root {
   font-family:

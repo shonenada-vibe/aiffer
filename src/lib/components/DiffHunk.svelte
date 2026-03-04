@@ -8,6 +8,7 @@
   interface Props {
     hunk: DiffHunk;
     filePath: string;
+    language: string | null;
     highlightedLineKey: string | null;
     activeCommentKey: string | null;
     onClickLine: (filePath: string, line: DiffLine) => void;
@@ -19,6 +20,7 @@
   let {
     hunk,
     filePath,
+    language,
     highlightedLineKey,
     activeCommentKey,
     onClickLine,
@@ -53,6 +55,7 @@
   <DiffLineRow
     {line}
     {filePath}
+    {language}
     highlighted={highlightedLineKey === key}
     commentCount={lineComments.length}
     {onClickLine}

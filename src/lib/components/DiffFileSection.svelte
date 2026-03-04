@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { DiffFile, DiffLine, FileStatus } from "../types/diff";
+  import { detectLanguage } from "../utils/highlight";
   import DiffHunkComponent from "./DiffHunk.svelte";
 
   interface Props {
@@ -27,6 +28,7 @@
   let localCollapsed = $state(false);
 
   let collapsed = $derived(forceCollapsed !== null ? forceCollapsed : localCollapsed);
+  let language = $derived(detectLanguage(file.path));
 
   function toggle() {
     localCollapsed = !localCollapsed;
@@ -122,6 +124,7 @@
             <DiffHunkComponent
               {hunk}
               filePath={file.path}
+              {language}
               {highlightedLineKey}
               {activeCommentKey}
               {onClickLine}

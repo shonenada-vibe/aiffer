@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { DiffLine } from "../types/diff";
+  import { highlightLine, detectLanguage } from "../utils/highlight";
 
   interface Props {
     line: DiffLine;
     filePath: string;
     highlighted: boolean;
     commentCount: number;
+    language: string | null;
     onClickLine: (filePath: string, line: DiffLine) => void;
     onClickComment: (filePath: string, line: DiffLine) => void;
   }
@@ -15,9 +17,12 @@
     filePath,
     highlighted,
     commentCount,
+    language,
     onClickLine,
     onClickComment,
   }: Props = $props();
+
+  let highlightedContent = $derived(highlightLine(line.content, language));
 
   let bgClass = $derived(
     highlighted
@@ -145,8 +150,12 @@
   </td>
   <!-- Content -->
   <td
-    class="whitespace-pre-wrap break-all pr-4 align-top font-mono text-xs {textClass}"
+    class="hljs whitespace-pre-wrap break-all pr-4 align-top font-mono text-xs {textClass}"
   >
-    {line.content || "\n"}
+    {#if language}
+      {@html highlightedContent || "&nbsp;"}
+    {:else}
+      {line.content || "\n"}
+    {/if}
   </td>
 </tr>
