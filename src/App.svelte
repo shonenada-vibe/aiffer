@@ -266,11 +266,13 @@
     commits={diffStore.commits}
     fromRef={diffStore.fromRef}
     toRef={diffStore.toRef}
+    theme={settingsStore.theme}
     onSubmitReview={handleSubmitReview}
     onOpenFolder={handleOpenFolder}
     onToggleAiPanel={() => (aiPanelOpen = !aiPanelOpen)}
     onToggleSettings={() => (settingsOpen = !settingsOpen)}
     onRefresh={handleRefresh}
+    onToggleTheme={() => settingsStore.toggleTheme()}
     onDiffTypeChange={handleDiffTypeChange}
     onFromRefChange={handleFromRefChange}
     onToRefChange={handleToRefChange}

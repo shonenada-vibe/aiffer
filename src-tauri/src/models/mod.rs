@@ -133,6 +133,8 @@ pub struct AppSettings {
     pub ai_model: String,
     #[serde(default = "default_diff_type")]
     pub diff_type: String,
+    #[serde(default = "default_theme")]
+    pub theme: String,
 }
 
 fn default_endpoint() -> String {
@@ -147,6 +149,10 @@ fn default_diff_type() -> String {
     "unstaged".to_string()
 }
 
+fn default_theme() -> String {
+    "light".to_string()
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
@@ -154,6 +160,7 @@ impl Default for AppSettings {
             ai_api_key: String::new(),
             ai_model: default_model(),
             diff_type: default_diff_type(),
+            theme: default_theme(),
         }
     }
 }

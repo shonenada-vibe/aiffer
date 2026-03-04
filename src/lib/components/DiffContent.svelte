@@ -63,11 +63,11 @@
   }
 </script>
 
-<main class="flex flex-1 flex-col overflow-auto bg-white">
+<main class="flex flex-1 flex-col overflow-auto bg-white dark:bg-[#0d1117]">
   {#if !hasFolder}
     <!-- Empty state: no folder -->
     <div
-      class="flex flex-1 flex-col items-center justify-center text-gray-400"
+      class="flex flex-1 flex-col items-center justify-center text-gray-400 dark:text-[#8b949e]"
     >
       <svg class="mb-4 h-16 w-16" viewBox="0 0 16 16" fill="currentColor">
         <path
@@ -77,13 +77,13 @@
           d="M8.753 5.505a.75.75 0 0 1 0-1.06l2.219-2.22a.75.75 0 1 1 1.06 1.061L10.564 4.75h2.186a.75.75 0 0 1 0 1.5h-2.186l1.469 1.468a.75.75 0 0 1-1.06 1.061l-2.22-2.219a.736.736 0 0 1 0-1.055Z"
         />
       </svg>
-      <h2 class="mb-2 text-lg font-medium text-gray-600">Welcome to Aiffer</h2>
-      <p class="mb-4 max-w-md text-center text-sm text-gray-500">
+      <h2 class="mb-2 text-lg font-medium text-gray-600 dark:text-[#e6edf3]">Welcome to Aiffer</h2>
+      <p class="mb-4 max-w-md text-center text-sm text-gray-500 dark:text-[#8b949e]">
         Open a git repository folder to view diffs and add review comments. Your
         comments will be collected and sent to an AI agent to understand the
         changes you want.
       </p>
-      <p class="text-xs text-gray-400">
+      <p class="text-xs text-gray-400 dark:text-[#8b949e]">
         Click the folder icon in the header to get started
       </p>
     </div>
@@ -105,21 +105,21 @@
     <div class="flex-1 p-4">
       <div class="space-y-4">
         {#each Array(3) as _}
-          <div class="rounded border border-gray-200">
-            <div class="flex items-center gap-2 bg-gray-50 px-4 py-2">
-              <div class="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
-              <div class="h-3 w-48 animate-pulse rounded bg-gray-200"></div>
+          <div class="rounded border border-gray-200 dark:border-[#30363d]">
+            <div class="flex items-center gap-2 bg-gray-50 dark:bg-[#161b22] px-4 py-2">
+              <div class="h-4 w-4 animate-pulse rounded bg-gray-200 dark:bg-[#30363d]"></div>
+              <div class="h-3 w-48 animate-pulse rounded bg-gray-200 dark:bg-[#30363d]"></div>
             </div>
             <div class="space-y-0 p-0">
               {#each Array(6) as _}
-                <div class="flex border-t border-gray-100">
+                <div class="flex border-t border-gray-100 dark:border-[#30363d]">
                   <div
-                    class="h-5 w-10 animate-pulse border-r border-gray-100 bg-gray-50"
+                    class="h-5 w-10 animate-pulse border-r border-gray-100 dark:border-[#30363d] bg-gray-50 dark:bg-[#161b22]"
                   ></div>
                   <div
-                    class="h-5 w-10 animate-pulse border-r border-gray-100 bg-gray-50"
+                    class="h-5 w-10 animate-pulse border-r border-gray-100 dark:border-[#30363d] bg-gray-50 dark:bg-[#161b22]"
                   ></div>
-                  <div class="h-5 flex-1 animate-pulse bg-gray-50"></div>
+                  <div class="h-5 flex-1 animate-pulse bg-gray-50 dark:bg-[#161b22]"></div>
                 </div>
               {/each}
             </div>
@@ -130,34 +130,34 @@
   {:else if diffFiles.length === 0}
     <!-- Empty state: no changes -->
     <div
-      class="flex flex-1 flex-col items-center justify-center text-gray-400"
+      class="flex flex-1 flex-col items-center justify-center text-gray-400 dark:text-[#8b949e]"
     >
       <svg class="mb-3 h-10 w-10" viewBox="0 0 16 16" fill="currentColor">
         <path
           d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"
         />
       </svg>
-      <p class="text-sm font-medium text-gray-600">No changes detected</p>
-      <p class="mt-1 text-xs text-gray-400">
+      <p class="text-sm font-medium text-gray-600 dark:text-[#e6edf3]">No changes detected</p>
+      <p class="mt-1 text-xs text-gray-400 dark:text-[#8b949e]">
         Your working directory is clean
       </p>
     </div>
   {:else}
     <!-- Diff stats bar -->
     <div
-      class="sticky top-0 z-[2] flex h-10 items-center gap-4 border-b border-gray-200 bg-gray-50 px-4"
+      class="sticky top-0 z-[2] flex h-10 items-center gap-4 border-b border-gray-200 dark:border-[#30363d] bg-gray-50 dark:bg-[#161b22] px-4"
     >
-      <span class="text-sm text-gray-600">
+      <span class="text-sm text-gray-600 dark:text-[#e6edf3]">
         Showing
         <span class="font-medium">{diffFiles.length}</span>
         changed file{diffFiles.length !== 1 ? "s" : ""}
       </span>
       <span class="flex gap-2 text-sm">
         {#if totalAdditions > 0}
-          <span class="font-medium text-green-600">+{totalAdditions}</span>
+          <span class="font-medium text-green-600 dark:text-[#3fb950]">+{totalAdditions}</span>
         {/if}
         {#if totalDeletions > 0}
-          <span class="font-medium text-red-600">-{totalDeletions}</span>
+          <span class="font-medium text-red-600 dark:text-[#f85149]">-{totalDeletions}</span>
         {/if}
       </span>
 
@@ -166,15 +166,15 @@
       <!-- Expand / Collapse all -->
       <div class="flex items-center gap-1">
         <button
-          class="rounded px-2 py-0.5 text-xs text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+          class="rounded px-2 py-0.5 text-xs text-gray-500 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d] hover:text-gray-700 dark:hover:text-[#e6edf3]"
           onclick={expandAll}
           title="Expand all files"
         >
           Expand all
         </button>
-        <span class="text-gray-300">|</span>
+        <span class="text-gray-300 dark:text-[#30363d]">|</span>
         <button
-          class="rounded px-2 py-0.5 text-xs text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+          class="rounded px-2 py-0.5 text-xs text-gray-500 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d] hover:text-gray-700 dark:hover:text-[#e6edf3]"
           onclick={collapseAll}
           title="Collapse all files"
         >
@@ -182,7 +182,7 @@
         </button>
         {#if forceCollapsed !== null}
           <button
-            class="ml-1 rounded px-1.5 py-0.5 text-xs text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+            class="ml-1 rounded px-1.5 py-0.5 text-xs text-blue-500 dark:text-[#58a6ff] hover:bg-blue-50 dark:hover:bg-[#1f6feb]/15 hover:text-blue-700 dark:hover:text-[#79c0ff]"
             onclick={resetForce}
             title="Reset to individual control"
           >

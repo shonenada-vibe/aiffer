@@ -39,10 +39,10 @@
 </script>
 
 <!-- Hunk header -->
-<tr class="bg-blue-50" data-hunk-header>
+<tr class="bg-blue-50 dark:bg-[#161b22]" data-hunk-header>
   <td
     colspan="4"
-    class="border-y border-blue-100 px-4 py-1 font-mono text-xs text-blue-700"
+    class="border-y border-blue-100 dark:border-[#30363d] px-4 py-1 font-mono text-xs text-blue-700 dark:text-[#58a6ff]"
   >
     {hunk.header}
   </td>

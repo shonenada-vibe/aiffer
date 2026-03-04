@@ -1,6 +1,6 @@
 <script lang="ts">
   import { settingsStore } from "../stores/settings.svelte";
-  import type { AppSettings } from "../stores/settings.svelte";
+  import type { AppSettings, Theme } from "../stores/settings.svelte";
 
   interface Props {
     isOpen: boolean;
@@ -13,6 +13,7 @@
   let apiKey = $state("");
   let model = $state("");
   let diffType = $state("unstaged");
+  let theme = $state<Theme>("light");
   let saving = $state(false);
   let showApiKey = $state(false);
   let validationError: string | null = $state(null);
@@ -25,6 +26,7 @@
       apiKey = s.aiApiKey;
       model = s.aiModel;
       diffType = s.diffType;
+      theme = s.theme;
       validationError = null;
     }
   });
@@ -47,6 +49,7 @@
         aiApiKey: apiKey.trim(),
         aiModel: model.trim(),
         diffType,
+        theme,
       };
       await settingsStore.save(settings);
       onClose();
@@ -73,16 +76,16 @@
   >
     <!-- Modal -->
     <div
-      class="w-full max-w-lg rounded-lg border border-gray-200 bg-white shadow-xl"
+      class="w-full max-w-lg rounded-lg border border-[var(--panel-border)] bg-[var(--panel-bg)] shadow-xl"
     >
       <!-- Header -->
       <div
-        class="flex items-center justify-between border-b border-gray-200 px-6 py-4"
+        class="flex items-center justify-between border-b border-[var(--panel-border)] px-6 py-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900">Settings</h2>
+        <h2 class="text-lg font-semibold text-[var(--app-fg)]">Settings</h2>
         <button
           onclick={onClose}
-          class="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          class="rounded p-1 text-[var(--panel-muted-fg)] hover:bg-[var(--panel-muted-bg)] hover:text-[var(--app-fg)]"
           title="Close settings"
         >
           <svg class="h-5 w-5" viewBox="0 0 16 16" fill="currentColor">
@@ -97,14 +100,14 @@
       <div class="space-y-6 px-6 py-4">
         <!-- AI Configuration -->
         <div>
-          <h3 class="mb-3 text-sm font-semibold text-gray-700">
+          <h3 class="mb-3 text-sm font-semibold text-[var(--app-fg)]">
             AI Configuration
           </h3>
           <div class="space-y-3">
             <div>
               <label
                 for="ai-endpoint"
-                class="mb-1 block text-xs font-medium text-gray-600"
+                class="mb-1 block text-xs font-medium text-[var(--panel-muted-fg)]"
                 >API Endpoint</label
               >
               <input
@@ -112,9 +115,9 @@
                 type="url"
                 bind:value={endpoint}
                 placeholder="https://api.openai.com/v1"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
               />
-              <p class="mt-0.5 text-[11px] text-gray-400">
+              <p class="mt-0.5 text-[11px] text-[var(--panel-faint-fg)]">
                 Any OpenAI-compatible API endpoint
               </p>
             </div>
@@ -122,7 +125,7 @@
             <div>
               <label
                 for="ai-api-key"
-                class="mb-1 block text-xs font-medium text-gray-600"
+                class="mb-1 block text-xs font-medium text-[var(--panel-muted-fg)]"
                 >API Key</label
               >
               <div class="flex gap-2">
@@ -131,12 +134,12 @@
                   type={showApiKey ? "text" : "password"}
                   bind:value={apiKey}
                   placeholder="sk-..."
-                  class="flex-1 rounded-md border border-gray-300 px-3 py-2 font-mono text-sm text-gray-800 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  class="flex-1 rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 font-mono text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
                 />
                 <button
                   type="button"
                   onclick={() => (showApiKey = !showApiKey)}
-                  class="rounded-md border border-gray-300 px-2 text-xs text-gray-500 hover:bg-gray-50"
+                  class="rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-2 text-xs text-[var(--panel-muted-fg)] hover:bg-[var(--panel-muted-bg)]"
                 >
                   {showApiKey ? "Hide" : "Show"}
                 </button>
@@ -146,7 +149,7 @@
             <div>
               <label
                 for="ai-model"
-                class="mb-1 block text-xs font-medium text-gray-600"
+                class="mb-1 block text-xs font-medium text-[var(--panel-muted-fg)]"
                 >Model</label
               >
               <input
@@ -154,27 +157,49 @@
                 type="text"
                 bind:value={model}
                 placeholder="gpt-4o"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] placeholder-[var(--panel-faint-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
               />
             </div>
           </div>
         </div>
 
+        <!-- Appearance -->
+        <div>
+          <h3 class="mb-3 text-sm font-semibold text-[var(--app-fg)]">
+            Appearance
+          </h3>
+          <div>
+            <label
+              for="theme"
+              class="mb-1 block text-xs font-medium text-[var(--panel-muted-fg)]"
+              >Theme</label
+            >
+            <select
+              id="theme"
+              bind:value={theme}
+              class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+            >
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Diff Options -->
         <div>
-          <h3 class="mb-3 text-sm font-semibold text-gray-700">
+          <h3 class="mb-3 text-sm font-semibold text-[var(--app-fg)]">
             Diff Options
           </h3>
           <div>
             <label
               for="diff-type"
-              class="mb-1 block text-xs font-medium text-gray-600"
+              class="mb-1 block text-xs font-medium text-[var(--panel-muted-fg)]"
               >Default Diff Type</label
             >
             <select
               id="diff-type"
               bind:value={diffType}
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              class="w-full rounded-md border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--app-fg)] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
             >
               <option value="unstaged">Unstaged Changes</option>
               <option value="staged">Staged Changes</option>
@@ -189,11 +214,11 @@
 
       <!-- Footer -->
       <div
-        class="flex items-center justify-end gap-2 border-t border-gray-200 px-6 py-4"
+        class="flex items-center justify-end gap-2 border-t border-[var(--panel-border)] px-6 py-4"
       >
         <button
           onclick={onClose}
-          class="rounded-md px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+          class="rounded-md px-4 py-2 text-sm text-[var(--panel-muted-fg)] hover:bg-[var(--panel-muted-bg)]"
         >
           Cancel
         </button>

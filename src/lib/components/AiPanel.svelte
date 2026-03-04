@@ -29,13 +29,13 @@
 </script>
 
 {#if isOpen}
-  <aside class="flex w-96 flex-col border-l border-gray-200 bg-gray-50">
+  <aside class="flex w-96 flex-col border-l border-[var(--panel-border)] bg-[var(--panel-muted-bg)]">
     <!-- Panel header -->
     <div
-      class="flex h-10 items-center justify-between border-b border-gray-200 px-3"
+      class="flex h-10 items-center justify-between border-b border-[var(--panel-border)] px-3"
     >
       <span
-        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+        class="text-xs font-semibold uppercase tracking-wide text-[var(--panel-muted-fg)]"
       >
         AI Response
       </span>
@@ -43,7 +43,7 @@
         {#if response && !loading}
           <button
             onclick={copyToClipboard}
-            class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+            class="rounded p-1 text-[var(--panel-muted-fg)] hover:bg-[var(--panel-border-subtle)] hover:text-[var(--app-fg)]"
             title={copied ? "Copied!" : "Copy to clipboard"}
           >
             {#if copied}
@@ -74,7 +74,7 @@
         {/if}
         <button
           onclick={onClose}
-          class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+          class="rounded p-1 text-[var(--panel-muted-fg)] hover:bg-[var(--panel-border-subtle)] hover:text-[var(--app-fg)]"
           title="Close panel"
         >
           <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -91,13 +91,13 @@
       {#if loading}
         <!-- Loading state -->
         <div
-          class="flex flex-col items-center justify-center py-12 text-gray-400"
+          class="flex flex-col items-center justify-center py-12 text-[var(--panel-muted-fg)]"
         >
           <div
-            class="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500"
+            class="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-[var(--panel-border)] border-t-blue-500"
           ></div>
           <span class="text-sm">Waiting for AI response...</span>
-          <span class="mt-1 text-xs text-gray-400"
+          <span class="mt-1 text-xs text-[var(--panel-faint-fg)]"
             >This may take a moment</span
           >
         </div>
@@ -125,14 +125,14 @@
       {:else if response}
         <!-- Rendered markdown response -->
         <div
-          class="prose prose-sm max-w-none text-gray-800 prose-headings:text-gray-900 prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:leading-relaxed prose-code:rounded prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none prose-pre:bg-gray-900 prose-pre:text-gray-100"
+          class="prose prose-sm max-w-none text-[var(--app-fg)] prose-headings:text-[var(--app-fg)] prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:leading-relaxed prose-code:rounded prose-code:bg-[var(--panel-border-subtle)] prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:text-[var(--app-fg)] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[#161b22] prose-pre:text-[#e6edf3]"
         >
           {@html renderedHtml}
         </div>
       {:else}
         <!-- Empty state -->
         <div
-          class="flex flex-col items-center justify-center py-12 text-gray-400"
+          class="flex flex-col items-center justify-center py-12 text-[var(--panel-muted-fg)]"
         >
           <svg class="mb-2 h-8 w-8" viewBox="0 0 16 16" fill="currentColor">
             <path

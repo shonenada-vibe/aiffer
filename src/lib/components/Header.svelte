@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { CommitInfo, DiffType } from "../types/diff";
+  import type { Theme } from "../stores/settings.svelte";
 
   interface Props {
     folderPath: string;
@@ -8,11 +9,13 @@
     commits: CommitInfo[];
     fromRef: string | null;
     toRef: string | null;
+    theme: Theme;
     onSubmitReview: () => void;
     onOpenFolder: () => void;
     onToggleAiPanel: () => void;
     onToggleSettings: () => void;
     onRefresh: () => void;
+    onToggleTheme: () => void;
     onDiffTypeChange: (type_: DiffType) => void;
     onFromRefChange: (ref_: string) => void;
     onToRefChange: (ref_: string) => void;
@@ -25,11 +28,13 @@
     commits,
     fromRef,
     toRef,
+    theme,
     onSubmitReview,
     onOpenFolder,
     onToggleAiPanel,
     onToggleSettings,
     onRefresh,
+    onToggleTheme,
     onDiffTypeChange,
     onFromRefChange,
     onToRefChange,
@@ -53,7 +58,7 @@
 </script>
 
 <header
-  class="flex h-14 items-center justify-between border-b border-gray-200 bg-gray-900 px-4 text-white"
+  class="flex h-14 items-center justify-between border-b border-[var(--header-border)] bg-[var(--header-bg)] px-4 text-[var(--header-fg)]"
 >
   <!-- Left section: logo + folder info -->
   <div class="flex items-center gap-3">
@@ -74,11 +79,11 @@
       <span class="text-lg font-semibold">Aiffer</span>
     </div>
 
-    <span class="text-gray-500">|</span>
+    <span class="text-[var(--header-muted-fg)]">|</span>
 
     <button
       onclick={onOpenFolder}
-      class="flex items-center gap-1.5 rounded px-2 py-1 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+      class="flex items-center gap-1.5 rounded px-2 py-1 text-sm text-[var(--header-muted-fg)] hover:bg-[var(--header-hover-bg)] hover:text-[var(--header-fg)]"
       title="Open folder"
     >
       <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -90,7 +95,7 @@
     </button>
 
     {#if folderPath}
-      <span class="max-w-xs truncate text-xs text-gray-500" title={folderPath}>
+      <span class="max-w-xs truncate text-xs text-[var(--header-muted-fg)]" title={folderPath}>
         {folderPath}
       </span>
     {/if}
@@ -99,7 +104,7 @@
   <!-- Center section: diff type selector -->
   <div class="flex items-center gap-2">
     <select
-      class="rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+      class="rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:border-blue-500 focus:outline-none"
       value={diffType}
       onchange={(e) =>
         onDiffTypeChange(
@@ -113,7 +118,7 @@
 
     {#if diffType === "commits"}
       <select
-        class="max-w-48 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+        class="max-w-48 rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:border-blue-500 focus:outline-none"
         value={fromRef ?? ""}
         onchange={(e) =>
           onFromRefChange((e.target as HTMLSelectElement).value)}
@@ -124,10 +129,10 @@
         {/each}
       </select>
 
-      <span class="text-xs text-gray-500">→</span>
+      <span class="text-xs text-[var(--header-muted-fg)]">→</span>
 
       <select
-        class="max-w-48 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+        class="max-w-48 rounded border border-[var(--header-border)] bg-[var(--panel-bg)] px-2 py-1 text-sm text-[var(--header-fg)] focus:border-blue-500 focus:outline-none"
         value={toRef ?? ""}
         onchange={(e) =>
           onToRefChange((e.target as HTMLSelectElement).value)}
@@ -144,7 +149,7 @@
   <div class="flex items-center gap-2">
     <button
       onclick={onRefresh}
-      class="rounded p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white"
+      class="rounded p-1.5 text-[var(--header-muted-fg)] hover:bg-[var(--header-hover-bg)] hover:text-[var(--header-fg)]"
       title="Refresh diffs"
     >
       <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -156,7 +161,7 @@
 
     <button
       onclick={onToggleAiPanel}
-      class="rounded p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white"
+      class="rounded p-1.5 text-[var(--header-muted-fg)] hover:bg-[var(--header-hover-bg)] hover:text-[var(--header-fg)]"
       title="Toggle AI panel"
     >
       <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -167,8 +172,30 @@
     </button>
 
     <button
+      onclick={onToggleTheme}
+      class="rounded p-1.5 text-[var(--header-muted-fg)] hover:bg-[var(--header-hover-bg)] hover:text-[var(--header-fg)]"
+      title="Toggle theme"
+    >
+      {#if theme === "dark"}
+        <!-- Sun icon (switch to light) -->
+        <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm5.657-8.157a.75.75 0 0 1 0 1.061l-1.061 1.06a.749.749 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm-9.193 9.193a.75.75 0 0 1 0 1.06l-1.06 1.061a.75.75 0 1 1-1.061-1.06l1.06-1.061a.75.75 0 0 1 1.061 0ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM3 8a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 3 8Zm13 0a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 16 8Zm-8 5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13Zm3.536-1.464a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.751.751 0 0 1-1.042.018.751.751 0 0 1-.018-1.042l-1.06-1.06a.75.75 0 0 1 0 .023Z"
+          />
+        </svg>
+      {:else}
+        <!-- Moon icon (switch to dark) -->
+        <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M9.598 1.591a.749.749 0 0 1 .785-.175 7.001 7.001 0 1 1-8.967 8.967.75.75 0 0 1 .961-.96 5.5 5.5 0 0 0 7.046-7.046.75.75 0 0 1 .175-.786Zm1.616 1.945a7 7 0 0 1-7.678 7.678 5.499 5.499 0 1 0 7.678-7.678Z"
+          />
+        </svg>
+      {/if}
+    </button>
+
+    <button
       onclick={onToggleSettings}
-      class="rounded p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white"
+      class="rounded p-1.5 text-[var(--header-muted-fg)] hover:bg-[var(--header-hover-bg)] hover:text-[var(--header-fg)]"
       title="Settings"
     >
       <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -178,7 +205,7 @@
       </svg>
     </button>
 
-    <div class="mx-1 h-6 w-px bg-gray-700"></div>
+    <div class="mx-1 h-6 w-px bg-[var(--header-border)]"></div>
 
     <button
       onclick={onSubmitReview}

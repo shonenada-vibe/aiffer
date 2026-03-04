@@ -63,14 +63,14 @@
 </script>
 
 {#if isOpen}
-  <aside class="flex w-96 flex-col border-l border-gray-200 bg-white">
+  <aside class="flex w-96 flex-col border-l border-[var(--panel-border)] bg-[var(--panel-bg)]">
     <!-- Panel header -->
     <div
-      class="flex h-10 items-center justify-between border-b border-gray-200 bg-gray-50 px-3"
+      class="flex h-10 items-center justify-between border-b border-[var(--panel-border)] bg-[var(--panel-muted-bg)] px-3"
     >
       <div class="flex items-center gap-2">
         <span
-          class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+          class="text-xs font-semibold uppercase tracking-wide text-[var(--panel-muted-fg)]"
         >
           Review Summary
         </span>
@@ -84,7 +84,7 @@
       </div>
       <button
         onclick={onClose}
-        class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+        class="rounded p-1 text-[var(--panel-muted-fg)] hover:bg-[var(--panel-border-subtle)] hover:text-[var(--app-fg)]"
         title="Close panel"
       >
         <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -100,27 +100,27 @@
       {#if commentStore.commentCount === 0}
         <!-- Empty state -->
         <div
-          class="flex flex-col items-center justify-center px-4 py-12 text-gray-400"
+          class="flex flex-col items-center justify-center px-4 py-12 text-[var(--panel-muted-fg)]"
         >
           <svg class="mb-3 h-10 w-10" viewBox="0 0 16 16" fill="currentColor">
             <path
               d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"
             />
           </svg>
-          <p class="text-sm font-medium text-gray-600">No comments yet</p>
-          <p class="mt-1 text-center text-xs text-gray-400">
+          <p class="text-sm font-medium text-[var(--app-fg)]">No comments yet</p>
+          <p class="mt-1 text-center text-xs text-[var(--panel-faint-fg)]">
             Click the + icon on diff lines to add review comments
           </p>
         </div>
       {:else}
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-[var(--panel-border-subtle)]">
           {#each grouped as group (group.filePath)}
             <!-- File group -->
             <div class="py-2">
               <!-- File header -->
               <div class="flex items-center gap-2 px-3 py-1">
                 <svg
-                  class="h-3.5 w-3.5 shrink-0 text-gray-400"
+                  class="h-3.5 w-3.5 shrink-0 text-[var(--panel-muted-fg)]"
                   viewBox="0 0 16 16"
                   fill="currentColor"
                 >
@@ -129,12 +129,12 @@
                   />
                 </svg>
                 <span
-                  class="min-w-0 flex-1 truncate font-mono text-xs font-medium text-gray-700"
+                  class="min-w-0 flex-1 truncate font-mono text-xs font-medium text-[var(--app-fg)]"
                   title={group.filePath}
                 >
                   {group.filePath}
                 </span>
-                <span class="text-xs text-gray-400">
+                <span class="text-xs text-[var(--panel-faint-fg)]">
                   {group.comments.length}
                 </span>
               </div>
@@ -144,18 +144,18 @@
                 {#each group.comments as comment (comment.id)}
                   {@const lineContent = getLineContent(comment.filePath, comment.lineNumber)}
                   <button
-                    class="w-full rounded border border-gray-200 bg-gray-50 p-2 text-left transition-colors hover:border-blue-300 hover:bg-blue-50"
+                    class="w-full rounded border border-[var(--panel-border)] bg-[var(--panel-muted-bg)] p-2 text-left transition-colors hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-[#0d419d20]"
                     onclick={() => scrollToComment(comment)}
                     title="Click to scroll to this comment"
                   >
-                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                    <div class="flex items-center gap-2 text-xs text-[var(--panel-muted-fg)]">
                       <span class="font-mono">L{comment.lineNumber}</span>
                       <span
                         class="rounded px-1 py-0.5 text-[10px] font-medium {comment.lineType === 'addition'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-green-100 text-green-700 dark:bg-[#3fb950]/10 dark:text-[#3fb950]'
                           : comment.lineType === 'deletion'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-gray-100 text-gray-600'}"
+                            ? 'bg-red-100 text-red-700 dark:bg-[#f85149]/10 dark:text-[#f85149]'
+                            : 'bg-gray-100 text-gray-600 dark:bg-[#8b949e]/10 dark:text-[#8b949e]'}"
                       >
                         {comment.lineType === "addition"
                           ? "+"
@@ -166,13 +166,13 @@
                     </div>
                     {#if lineContent}
                       <div
-                        class="mt-1 truncate rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-600"
+                        class="mt-1 truncate rounded bg-[var(--panel-border-subtle)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--panel-muted-fg)]"
                       >
                         {lineContent}
                       </div>
                     {/if}
                     <p
-                      class="mt-1 line-clamp-2 text-sm text-gray-800"
+                      class="mt-1 line-clamp-2 text-sm text-[var(--app-fg)]"
                     >
                       {comment.body}
                     </p>
@@ -188,7 +188,7 @@
     <!-- Panel footer -->
     {#if commentStore.commentCount > 0}
       <div
-        class="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-3 py-2"
+        class="flex items-center justify-between border-t border-[var(--panel-border)] bg-[var(--panel-muted-bg)] px-3 py-2"
       >
         {#if confirmClear}
           <div class="flex items-center gap-2">
@@ -200,7 +200,7 @@
               Confirm
             </button>
             <button
-              class="rounded px-2 py-1 text-xs text-gray-600 hover:bg-gray-200"
+              class="rounded px-2 py-1 text-xs text-[var(--panel-muted-fg)] hover:bg-[var(--panel-border-subtle)]"
               onclick={() => (confirmClear = false)}
             >
               Cancel

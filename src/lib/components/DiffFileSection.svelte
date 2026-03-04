@@ -48,26 +48,26 @@
 
   function statusBadgeClass(status: FileStatus): string {
     const map: Record<FileStatus, string> = {
-      added: "bg-green-100 text-green-700",
-      modified: "bg-yellow-100 text-yellow-700",
-      deleted: "bg-red-100 text-red-700",
-      renamed: "bg-blue-100 text-blue-700",
-      copied: "bg-blue-100 text-blue-700",
-      untracked: "bg-gray-100 text-gray-600",
+      added: "bg-green-100 text-green-700 dark:bg-[#3fb950]/10 dark:text-[#3fb950]",
+      modified: "bg-yellow-100 text-yellow-700 dark:bg-[#d29922]/10 dark:text-[#d29922]",
+      deleted: "bg-red-100 text-red-700 dark:bg-[#f85149]/10 dark:text-[#f85149]",
+      renamed: "bg-blue-100 text-blue-700 dark:bg-[#58a6ff]/10 dark:text-[#58a6ff]",
+      copied: "bg-blue-100 text-blue-700 dark:bg-[#58a6ff]/10 dark:text-[#58a6ff]",
+      untracked: "bg-gray-100 text-gray-600 dark:bg-[#8b949e]/10 dark:text-[#8b949e]",
     };
     return map[status];
   }
 </script>
 
-<section id="diff-file-{file.path}" class="border-b border-gray-200">
+<section id="diff-file-{file.path}" class="border-b border-gray-200 dark:border-[#30363d]">
   <!-- File header -->
   <button
-    class="sticky top-0 z-[1] flex w-full items-center gap-2 border-b border-gray-200 bg-gray-50 px-4 py-2 text-left hover:bg-gray-100"
+    class="sticky top-0 z-[1] flex w-full items-center gap-2 border-b border-gray-200 dark:border-[#30363d] bg-gray-50 dark:bg-[#161b22] px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-[#30363d]"
     onclick={toggle}
   >
     <!-- Collapse chevron -->
     <svg
-      class="h-3.5 w-3.5 shrink-0 text-gray-500 transition-transform {collapsed
+      class="h-3.5 w-3.5 shrink-0 text-gray-500 dark:text-[#8b949e] transition-transform {collapsed
         ? '-rotate-90'
         : ''}"
       viewBox="0 0 16 16"
@@ -80,7 +80,7 @@
 
     <!-- File icon -->
     <svg
-      class="h-4 w-4 shrink-0 text-gray-400"
+      class="h-4 w-4 shrink-0 text-gray-400 dark:text-[#8b949e]"
       viewBox="0 0 16 16"
       fill="currentColor"
     >
@@ -90,10 +90,10 @@
     </svg>
 
     <!-- File path -->
-    <span class="min-w-0 flex-1 truncate font-mono text-sm text-gray-800">
+    <span class="min-w-0 flex-1 truncate font-mono text-sm text-gray-800 dark:text-[#e6edf3]">
       {file.path}
       {#if file.oldPath}
-        <span class="text-gray-400">(was {file.oldPath})</span>
+        <span class="text-gray-400 dark:text-[#8b949e]">(was {file.oldPath})</span>
       {/if}
     </span>
 
@@ -107,10 +107,10 @@
     <!-- Stats -->
     <span class="flex shrink-0 gap-1.5 text-xs">
       {#if file.stats.additions > 0}
-        <span class="font-medium text-green-600">+{file.stats.additions}</span>
+        <span class="font-medium text-green-600 dark:text-[#3fb950]">+{file.stats.additions}</span>
       {/if}
       {#if file.stats.deletions > 0}
-        <span class="font-medium text-red-600">-{file.stats.deletions}</span>
+        <span class="font-medium text-red-600 dark:text-[#f85149]">-{file.stats.deletions}</span>
       {/if}
     </span>
   </button>

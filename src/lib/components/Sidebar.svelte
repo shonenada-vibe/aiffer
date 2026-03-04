@@ -64,12 +64,12 @@
 
   function statusColor(status: FileStatus): string {
     const map: Record<FileStatus, string> = {
-      added: "text-green-600 bg-green-50",
-      modified: "text-yellow-600 bg-yellow-50",
-      deleted: "text-red-600 bg-red-50",
-      renamed: "text-blue-600 bg-blue-50",
-      copied: "text-blue-600 bg-blue-50",
-      untracked: "text-gray-500 bg-gray-100",
+      added: "text-green-600 bg-green-50 dark:text-[#3fb950] dark:bg-[#3fb950]/10",
+      modified: "text-yellow-600 bg-yellow-50 dark:text-[#d29922] dark:bg-[#d29922]/10",
+      deleted: "text-red-600 bg-red-50 dark:text-[#f85149] dark:bg-[#f85149]/10",
+      renamed: "text-blue-600 bg-blue-50 dark:text-[#58a6ff] dark:bg-[#58a6ff]/10",
+      copied: "text-blue-600 bg-blue-50 dark:text-[#58a6ff] dark:bg-[#58a6ff]/10",
+      untracked: "text-gray-500 bg-gray-100 dark:text-[#8b949e] dark:bg-[#8b949e]/10",
     };
     return map[status];
   }
@@ -86,34 +86,34 @@
 </script>
 
 <aside
-  class="relative flex flex-col border-r border-gray-200 bg-gray-50"
+  class="relative flex flex-col border-r border-gray-200 bg-gray-50 dark:border-[#30363d] dark:bg-[#161b22]"
   style="width: {width}px; min-width: {width}px;"
 >
   <!-- Sidebar header -->
   <div
-    class="flex h-10 items-center justify-between border-b border-gray-200 px-3"
+    class="flex h-10 items-center justify-between border-b border-gray-200 px-3 dark:border-[#30363d]"
   >
-    <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+    <span class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-[#8b949e]">
       Changed Files
     </span>
     {#if files.length > 0}
-      <span class="text-xs text-gray-400">{files.length}</span>
+      <span class="text-xs text-gray-400 dark:text-[#8b949e]">{files.length}</span>
     {/if}
   </div>
 
   <!-- Overall stats -->
   {#if hasFolder && files.length > 0}
     <div
-      class="flex items-center gap-3 border-b border-gray-200 px-3 py-2 text-xs"
+      class="flex items-center gap-3 border-b border-gray-200 px-3 py-2 text-xs dark:border-[#30363d]"
     >
-      <span class="text-gray-500">
+      <span class="text-gray-500 dark:text-[#8b949e]">
         {files.length} file{files.length !== 1 ? "s" : ""} changed
       </span>
       {#if totalAdditions > 0}
-        <span class="font-medium text-green-600">+{totalAdditions}</span>
+        <span class="font-medium text-green-600 dark:text-[#3fb950]">+{totalAdditions}</span>
       {/if}
       {#if totalDeletions > 0}
-        <span class="font-medium text-red-600">-{totalDeletions}</span>
+        <span class="font-medium text-red-600 dark:text-[#f85149]">-{totalDeletions}</span>
       {/if}
     </div>
   {/if}
@@ -125,15 +125,15 @@
       <div class="space-y-1 p-2">
         {#each Array(5) as _}
           <div class="flex items-center gap-2 rounded px-2 py-1.5">
-            <div class="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
-            <div class="h-3 flex-1 animate-pulse rounded bg-gray-200"></div>
+            <div class="h-4 w-4 animate-pulse rounded bg-gray-200 dark:bg-[#30363d]"></div>
+            <div class="h-3 flex-1 animate-pulse rounded bg-gray-200 dark:bg-[#30363d]"></div>
           </div>
         {/each}
       </div>
     {:else if !hasFolder}
       <!-- Empty state: no folder -->
       <div
-        class="flex flex-col items-center justify-center py-8 text-gray-400"
+        class="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-[#8b949e]"
       >
         <svg class="mb-2 h-8 w-8" viewBox="0 0 16 16" fill="currentColor">
           <path
@@ -145,7 +145,7 @@
     {:else if files.length === 0}
       <!-- Empty state: no changes -->
       <div
-        class="flex flex-col items-center justify-center py-8 text-gray-400"
+        class="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-[#8b949e]"
       >
         <svg class="mb-2 h-8 w-8" viewBox="0 0 16 16" fill="currentColor">
           <path
@@ -161,8 +161,8 @@
           <button
             class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors
               {selectedFile === file.path
-              ? 'bg-blue-100 text-blue-900'
-              : 'text-gray-700 hover:bg-gray-100'}"
+              ? 'bg-blue-100 text-blue-900 dark:bg-[#1f6feb]/20 dark:text-[#58a6ff]'
+              : 'text-gray-700 hover:bg-gray-100 dark:text-[#e6edf3] dark:hover:bg-[#30363d]'}"
             onclick={() => onSelectFile(file.path)}
             title={file.path}
           >
@@ -176,7 +176,7 @@
             <!-- File name + directory -->
             <span class="min-w-0 flex-1 truncate">
               {#if fileDir(file.path)}
-                <span class="text-gray-400">{fileDir(file.path)}</span>
+                <span class="text-gray-400 dark:text-[#8b949e]">{fileDir(file.path)}</span>
               {/if}
               <span class="font-medium">{fileName(file.path)}</span>
             </span>
@@ -184,10 +184,10 @@
             <!-- Diff stats -->
             <span class="flex shrink-0 gap-1 text-xs">
               {#if file.additions > 0}
-                <span class="text-green-600">+{file.additions}</span>
+                <span class="text-green-600 dark:text-[#3fb950]">+{file.additions}</span>
               {/if}
               {#if file.deletions > 0}
-                <span class="text-red-600">-{file.deletions}</span>
+                <span class="text-red-600 dark:text-[#f85149]">-{file.deletions}</span>
               {/if}
             </span>
           </button>

@@ -26,11 +26,11 @@
 
   let bgClass = $derived(
     highlighted
-      ? "bg-yellow-100"
+      ? "bg-yellow-100 dark:bg-[#bb800926]"
       : line.lineType === "addition"
-        ? "bg-green-50"
+        ? "bg-green-50 dark:bg-[#1a4721]"
         : line.lineType === "deletion"
-          ? "bg-red-50"
+          ? "bg-red-50 dark:bg-[#67060c]"
           : "",
   );
 
@@ -38,28 +38,28 @@
     highlighted
       ? ""
       : line.lineType === "addition"
-        ? "hover:bg-green-100/60"
+        ? "hover:bg-green-100/60 dark:hover:bg-[#1a4721]/80"
         : line.lineType === "deletion"
-          ? "hover:bg-red-100/60"
-          : "hover:bg-gray-50",
+          ? "hover:bg-red-100/60 dark:hover:bg-[#67060c]/80"
+          : "hover:bg-gray-50 dark:hover:bg-[#161b22]",
   );
 
   let gutterBgClass = $derived(
     highlighted
-      ? "bg-yellow-200"
+      ? "bg-yellow-200 dark:bg-[#bb800940]"
       : line.lineType === "addition"
-        ? "bg-green-100"
+        ? "bg-green-100 dark:bg-[#1a4721]/60"
         : line.lineType === "deletion"
-          ? "bg-red-100"
-          : "bg-gray-50",
+          ? "bg-red-100 dark:bg-[#67060c]/60"
+          : "bg-gray-50 dark:bg-[#161b22]",
   );
 
   let textClass = $derived(
     line.lineType === "addition"
-      ? "text-green-800"
+      ? "text-green-800 dark:text-[#3fb950]"
       : line.lineType === "deletion"
-        ? "text-red-800"
-        : "text-gray-800",
+        ? "text-red-800 dark:text-[#f85149]"
+        : "text-gray-800 dark:text-[#e6edf3]",
   );
 
   let prefix = $derived(
@@ -79,7 +79,7 @@
 >
   <!-- Comment trigger button (appears on hover) / Comment count badge -->
   <td
-    class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 {gutterBgClass} relative"
+    class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 dark:border-[#30363d] {gutterBgClass} relative"
   >
     {#if commentCount > 0}
       <button
@@ -119,7 +119,7 @@
     {/if}
     <!-- Old line number -->
     <span
-      class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 group-hover:text-gray-600"
+      class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 dark:text-[#8b949e] group-hover:text-gray-600 dark:group-hover:text-[#e6edf3]"
       role="button"
       tabindex="-1"
       onclick={() => onClickLine(filePath, line)}
@@ -130,10 +130,10 @@
   </td>
   <!-- New line number -->
   <td
-    class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 {gutterBgClass}"
+    class="w-[1px] select-none whitespace-nowrap border-r border-gray-200 dark:border-[#30363d] {gutterBgClass}"
   >
     <span
-      class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 group-hover:text-gray-600"
+      class="block cursor-pointer px-2 text-right font-mono text-xs text-gray-400 dark:text-[#8b949e] group-hover:text-gray-600 dark:group-hover:text-[#e6edf3]"
       role="button"
       tabindex="-1"
       onclick={() => onClickLine(filePath, line)}

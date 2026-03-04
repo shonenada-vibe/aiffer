@@ -68,20 +68,20 @@
 </script>
 
 <tr>
-  <td colspan="4" class="border-b border-gray-200 p-0">
+  <td colspan="4" class="border-b border-gray-200 dark:border-[#30363d] p-0">
     <div class="mx-4 my-1 space-y-1">
       {#each visibleComments as comment (comment.id)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
-          class="group/comment rounded-r border-l-2 border-blue-400 bg-gray-50"
+          class="group/comment rounded-r border-l-2 border-blue-400 dark:border-[#58a6ff] bg-gray-50 dark:bg-[#161b22]"
         >
           <div class="flex items-start gap-2 px-3 py-2">
             <!-- Avatar placeholder -->
             <div
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-300"
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-[#30363d]"
             >
               <svg
-                class="h-3.5 w-3.5 text-gray-500"
+                class="h-3.5 w-3.5 text-gray-500 dark:text-[#8b949e]"
                 viewBox="0 0 16 16"
                 fill="currentColor"
               >
@@ -94,8 +94,8 @@
             <div class="min-w-0 flex-1">
               <!-- Header: name + time -->
               <div class="flex items-center gap-2 text-xs">
-                <span class="font-medium text-gray-700">You</span>
-                <span class="text-gray-400"
+                <span class="font-medium text-gray-700 dark:text-[#e6edf3]">You</span>
+                <span class="text-gray-400 dark:text-[#8b949e]"
                   >{formatTime(comment.createdAt)}</span
                 >
               </div>
@@ -104,7 +104,7 @@
                 <!-- Edit mode -->
                 <textarea
                   bind:value={editBody}
-                  class="mt-1 w-full resize-y rounded border border-gray-200 bg-white px-2 py-1 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  class="mt-1 w-full resize-y rounded border border-gray-200 dark:border-[#30363d] bg-white dark:bg-[#0d1117] px-2 py-1 text-sm text-gray-800 dark:text-[#e6edf3] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
                   rows="2"
                   onkeydown={(e) => {
                     if (e.key === "Escape") cancelEdit();
@@ -120,7 +120,7 @@
                     Save
                   </button>
                   <button
-                    class="rounded px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-200"
+                    class="rounded px-2 py-0.5 text-xs text-gray-600 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d]"
                     onclick={cancelEdit}
                   >
                     Cancel
@@ -128,7 +128,7 @@
                 </div>
               {:else}
                 <!-- Display mode -->
-                <p class="mt-0.5 whitespace-pre-wrap text-sm text-gray-800">
+                <p class="mt-0.5 whitespace-pre-wrap text-sm text-gray-800 dark:text-[#e6edf3]">
                   {comment.body}
                 </p>
               {/if}
@@ -145,7 +145,7 @@
                     Delete
                   </button>
                   <button
-                    class="rounded px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-200"
+                    class="rounded px-2 py-0.5 text-xs text-gray-600 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d]"
                     onclick={cancelDelete}
                   >
                     Cancel
@@ -156,7 +156,7 @@
                   class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover/comment:opacity-100"
                 >
                   <button
-                    class="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                    class="rounded p-1 text-gray-400 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d] hover:text-gray-600 dark:hover:text-[#e6edf3]"
                     title="Edit"
                     onclick={() => startEdit(comment)}
                   >
@@ -171,7 +171,7 @@
                     </svg>
                   </button>
                   <button
-                    class="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                    class="rounded p-1 text-gray-400 dark:text-[#8b949e] hover:bg-red-50 dark:hover:bg-[#67060c] hover:text-red-600 dark:hover:text-[#f85149]"
                     title="Delete"
                     onclick={() => confirmDelete(comment.id)}
                   >
@@ -194,7 +194,7 @@
 
       {#if hiddenCount > 0}
         <button
-          class="w-full rounded py-1 text-center text-xs text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+          class="w-full rounded py-1 text-center text-xs text-blue-500 dark:text-[#58a6ff] hover:bg-blue-50 dark:hover:bg-[#1f6feb]/15 hover:text-blue-700 dark:hover:text-[#79c0ff]"
           onclick={() => (showAll = true)}
         >
           Show {hiddenCount} more comment{hiddenCount !== 1 ? "s" : ""}

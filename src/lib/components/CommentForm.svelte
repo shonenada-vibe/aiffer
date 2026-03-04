@@ -33,32 +33,32 @@
 </script>
 
 <tr>
-  <td colspan="4" class="border-b border-gray-200 p-0">
+  <td colspan="4" class="border-b border-gray-200 dark:border-[#30363d] p-0">
     <div
-      class="mx-4 my-2 rounded-md border border-gray-300 bg-white shadow-sm"
+      class="mx-4 my-2 rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#161b22] shadow-sm"
     >
       <div class="p-3">
         <textarea
           bind:this={textareaEl}
           bind:value={body}
-          class="w-full resize-y rounded border border-gray-200 bg-gray-50 px-3 py-2 font-sans text-sm text-gray-800 placeholder-gray-400 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+          class="w-full resize-y rounded border border-gray-200 dark:border-[#30363d] bg-gray-50 dark:bg-[#0d1117] px-3 py-2 font-sans text-sm text-gray-800 dark:text-[#e6edf3] placeholder-gray-400 dark:placeholder-[#8b949e] focus:border-blue-400 focus:bg-white dark:focus:bg-[#161b22] focus:outline-none focus:ring-1 focus:ring-blue-400"
           rows="3"
           placeholder="Leave a comment..."
           onkeydown={handleKeydown}
         ></textarea>
       </div>
       <div
-        class="flex items-center justify-between rounded-b-md border-t border-gray-100 bg-gray-50 px-3 py-2"
+        class="flex items-center justify-between rounded-b-md border-t border-gray-100 dark:border-[#30363d] bg-gray-50 dark:bg-[#161b22] px-3 py-2"
       >
-        <span class="text-xs text-gray-400">
+        <span class="text-xs text-gray-400 dark:text-[#8b949e]">
           <kbd
-            class="rounded border border-gray-300 bg-white px-1 py-0.5 font-mono text-[10px]"
+            class="rounded border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#0d1117] px-1 py-0.5 font-mono text-[10px]"
           >
             {navigator.platform.includes("Mac") ? "Cmd" : "Ctrl"}+Enter
           </kbd>
           to submit,
           <kbd
-            class="rounded border border-gray-300 bg-white px-1 py-0.5 font-mono text-[10px]"
+            class="rounded border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#0d1117] px-1 py-0.5 font-mono text-[10px]"
           >
             Esc
           </kbd>
@@ -66,7 +66,7 @@
         </span>
         <div class="flex gap-2">
           <button
-            class="rounded px-3 py-1 text-sm text-gray-600 hover:bg-gray-200"
+            class="rounded px-3 py-1 text-sm text-gray-600 dark:text-[#8b949e] hover:bg-gray-200 dark:hover:bg-[#30363d]"
             onclick={onCancel}
           >
             Cancel

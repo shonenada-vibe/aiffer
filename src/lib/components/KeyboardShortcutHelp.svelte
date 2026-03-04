@@ -48,20 +48,20 @@
     <!-- Modal -->
     <!-- svelte-ignore a11y_interactive_supports_focus -->
     <div
-      class="w-full max-w-md rounded-lg bg-white shadow-xl"
+      class="w-full max-w-md rounded-lg border border-[var(--panel-border)] bg-[var(--panel-bg)] shadow-xl"
       role="dialog"
       aria-label="Keyboard shortcuts"
       onclick={(e) => e.stopPropagation()}
       onkeydown={() => {}}
     >
       <div
-        class="flex items-center justify-between border-b border-gray-200 px-5 py-3"
+        class="flex items-center justify-between border-b border-[var(--panel-border)] px-5 py-3"
       >
-        <h2 class="text-base font-semibold text-gray-800">
+        <h2 class="text-base font-semibold text-[var(--app-fg)]">
           Keyboard Shortcuts
         </h2>
         <button
-          class="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          class="rounded p-1 text-[var(--panel-muted-fg)] hover:bg-[var(--panel-muted-bg)] hover:text-[var(--app-fg)]"
           onclick={onClose}
           aria-label="Close keyboard shortcuts"
         >
@@ -76,19 +76,19 @@
       <div class="px-5 py-4">
         {#each SHORTCUT_GROUPS as group}
           <div class="mb-4 last:mb-0">
-            <h3 class="mb-2 text-xs font-semibold uppercase text-gray-500">
+            <h3 class="mb-2 text-xs font-semibold uppercase text-[var(--panel-muted-fg)]">
               {group.title}
             </h3>
             <div class="space-y-1.5">
               {#each group.shortcuts as shortcut}
                 <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-700"
+                  <span class="text-sm text-[var(--app-fg)]"
                     >{shortcut.description}</span
                   >
                   <div class="flex gap-1">
                     {#each shortcut.keys as key}
                       <kbd
-                        class="rounded border border-gray-300 bg-gray-50 px-1.5 py-0.5 font-mono text-xs text-gray-600 shadow-sm"
+                        class="rounded border border-[var(--input-border)] bg-[var(--input-muted-bg)] px-1.5 py-0.5 font-mono text-xs text-[var(--panel-muted-fg)] shadow-sm"
                       >
                         {key}
                       </kbd>
