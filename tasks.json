@@ -311,7 +311,7 @@
       "Handle network errors for AI API calls with clear user feedback",
       "Ensure all error messages are actionable (tell user what to do)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "022-e2e-smoke-test",

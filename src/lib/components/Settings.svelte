@@ -1,6 +1,7 @@
 <script lang="ts">
   import { settingsStore } from "../stores/settings.svelte";
   import type { AppSettings, Theme } from "../stores/settings.svelte";
+  import { toastStore } from "../stores/toast.svelte";
 
   interface Props {
     isOpen: boolean;
@@ -53,6 +54,7 @@
         lastOpenedFolder: settingsStore.settings.lastOpenedFolder,
       };
       await settingsStore.save(settings);
+      toastStore.success("Settings saved");
       onClose();
     } catch (err) {
       validationError =

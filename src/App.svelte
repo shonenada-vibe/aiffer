@@ -8,9 +8,12 @@
   import ReviewSummary from "./lib/components/ReviewSummary.svelte";
   import Settings from "./lib/components/Settings.svelte";
   import KeyboardShortcutHelp from "./lib/components/KeyboardShortcutHelp.svelte";
+  import ErrorBoundary from "./lib/components/ErrorBoundary.svelte";
+  import ToastContainer from "./lib/components/ToastContainer.svelte";
   import { diffStore } from "./lib/stores/diff.svelte";
   import { commentStore } from "./lib/stores/comments.svelte";
   import { settingsStore } from "./lib/stores/settings.svelte";
+  import { toastStore } from "./lib/stores/toast.svelte";
   import type { DiffLine, DiffType } from "./lib/types/diff";
   import type { CommentInput, ReviewPayload } from "./lib/types/comment";
 
@@ -59,11 +62,24 @@
         ...settingsStore.settings,
         lastOpenedFolder: canonicalPath,
       });
+      const folderName = canonicalPath.split("/").pop() ?? canonicalPath;
+      toastStore.success(`Opened repository: ${folderName}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      diffStore.setError(
-        `Not a git repository: ${path}\n\nPlease open a folder that contains a .git directory, or initialize one with "git init".`,
-      );
+      if (msg.includes("not a git repository") || msg.includes("NotARepo") || msg.includes("Not a repo")) {
+        diffStore.setError(
+          `Not a git repository: ${path}\n\nPlease open a folder that contains a .git directory, or initialize one with "git init".`,
+        );
+        toastStore.error("Not a git repository. Try running \"git init\" first.");
+      } else if (msg.includes("Permission denied") || msg.includes("permission")) {
+        diffStore.setError(
+          `Permission denied: ${path}\n\nCheck that you have read access to this directory.`,
+        );
+        toastStore.error("Permission denied. Check folder access permissions.");
+      } else {
+        diffStore.setError(`Failed to open folder: ${msg}`);
+        toastStore.error(`Failed to open folder: ${msg}`);
+      }
     }
   }
 
@@ -116,8 +132,23 @@
       });
 
       aiResponse = response;
+      toastStore.success("AI review received");
     } catch (err) {
-      aiError = err instanceof Error ? err.message : String(err);
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("endpoint") || msg.includes("Endpoint")) {
+        aiError = `API endpoint not configured.\n\nGo to Settings and enter your API endpoint URL.`;
+      } else if (msg.includes("API key") || msg.includes("api_key") || msg.includes("Unauthorized") || msg.includes("401")) {
+        aiError = `Authentication failed.\n\nCheck your API key in Settings. Make sure it is valid and has not expired.`;
+      } else if (msg.includes("timeout") || msg.includes("Timeout")) {
+        aiError = `Request timed out.\n\nThe AI service may be slow or unreachable. Try again in a moment.`;
+      } else if (msg.includes("connection") || msg.includes("Connection") || msg.includes("network")) {
+        aiError = `Network error.\n\nCheck your internet connection and verify the API endpoint is reachable.`;
+      } else if (msg.includes("model") || msg.includes("Model")) {
+        aiError = `Invalid model.\n\nCheck your model name in Settings. The configured model may not be available.`;
+      } else {
+        aiError = msg;
+      }
+      toastStore.error("AI review failed. See details in the panel.");
     } finally {
       aiLoading = false;
     }
@@ -156,6 +187,9 @@
 
   async function handleRefresh() {
     await diffStore.refresh();
+    if (!diffStore.error) {
+      toastStore.info("Diffs refreshed");
+    }
   }
 
   function handleSelectFile(path: string) {
@@ -169,6 +203,7 @@
   function handleSubmitComment(filePath: string, line: DiffLine, body: string) {
     const lineNumber = line.newLineno ?? line.oldLineno ?? 0;
     commentStore.addComment(filePath, lineNumber, line.lineType, body);
+    toastStore.success("Comment added");
   }
 
   // Drag-and-drop handlers
@@ -335,6 +370,8 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
+<ErrorBoundary>
+{#snippet children()}
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="flex h-screen flex-col overflow-hidden"
@@ -419,6 +456,9 @@
   isOpen={shortcutHelpOpen}
   onClose={() => (shortcutHelpOpen = false)}
 />
+<ToastContainer />
+{/snippet}
+</ErrorBoundary>
 
 <style>
   .drop-overlay {

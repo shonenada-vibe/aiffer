@@ -124,7 +124,16 @@ export const diffStore = {
         _selectedFile = files[0].path;
       }
     } catch (e) {
-      _error = typeof e === "string" ? e : "Failed to read diffs";
+      const msg = typeof e === "string" ? e : "Failed to read diffs";
+      if (msg.includes("not a git repository") || msg.includes("NotARepo")) {
+        _error = `Not a git repository.\n\nThe folder may have been moved or the .git directory was deleted. Try reopening the folder.`;
+      } else if (msg.includes("Permission denied") || msg.includes("permission")) {
+        _error = `Permission denied.\n\nCheck that you have read access to the repository files.`;
+      } else if (msg.includes("corrupt") || msg.includes("Corrupt")) {
+        _error = `Repository appears to be corrupted.\n\nTry running "git fsck" in your terminal to diagnose the issue.`;
+      } else {
+        _error = msg;
+      }
       _files = [];
       _diffFiles = [];
     } finally {
