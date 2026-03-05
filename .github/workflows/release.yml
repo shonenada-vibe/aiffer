@@ -5,12 +5,28 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "aiffer ${{ github.ref_name }}"
+          body: "See assets below for platform-specific installers."
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
   release:
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -67,8 +83,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "aiffer ${{ github.ref_name }}"
-          releaseBody: "See assets below for platform-specific installers."
-          releaseDraft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
           args: --target ${{ matrix.target }}
