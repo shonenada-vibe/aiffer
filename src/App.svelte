@@ -177,6 +177,58 @@
     }
   }
 
+  async function handleCopySimplePrompt() {
+    try {
+      const allComments = commentStore.allComments;
+      if (allComments.length === 0) {
+        toastStore.info("No comments to copy");
+        return;
+      }
+
+      const CONTEXT_LINES = 3;
+      const blocks: string[] = [];
+      for (const comment of allComments) {
+        const file = diffStore.diffFiles.find((f) => f.path === comment.filePath);
+        let diffSnippet = "";
+        if (file) {
+          // Collect all lines from the hunk containing the commented line
+          for (const hunk of file.hunks) {
+            const allLines = hunk.lines;
+            const targetIdx = allLines.findIndex((l) => {
+              const ln = l.newLineno ?? l.oldLineno ?? 0;
+              return ln === comment.lineNumber;
+            });
+            if (targetIdx === -1) continue;
+
+            const startIdx = Math.max(0, targetIdx - CONTEXT_LINES);
+            const endIdx = Math.min(allLines.length - 1, targetIdx + CONTEXT_LINES);
+            const snippetLines: string[] = [];
+            for (let i = startIdx; i <= endIdx; i++) {
+              const l = allLines[i];
+              const prefix = l.lineType === "addition" ? "+" : l.lineType === "deletion" ? "-" : " ";
+              snippetLines.push(`${prefix}${l.content}`);
+            }
+            diffSnippet = snippetLines.join("\n");
+            break;
+          }
+        }
+
+        let block = `@${comment.filePath}:${comment.lineNumber}`;
+        if (diffSnippet) {
+          block += `\n${diffSnippet}`;
+        }
+        block += `\n\nComment: ${comment.body}`;
+        blocks.push(block);
+      }
+
+      await writeText(blocks.join("\n\n"));
+      toastStore.success("Simple prompt copied to clipboard");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toastStore.error(`Failed to copy prompt: ${msg}`);
+    }
+  }
+
   async function handleDiffTypeChange(type_: DiffType) {
     if (
       commentStore.commentCount > 0 &&
@@ -449,6 +501,7 @@
       onClose={() => (reviewPanelOpen = false)}
       onSubmitToAi={handleSubmitToAi}
       onCopyPrompt={handleCopyPrompt}
+      onCopySimplePrompt={handleCopySimplePrompt}
     />
 
     <AiPanel

@@ -367,5 +367,47 @@
       "Handle large files gracefully (consider virtualization or lazy rendering for files over 1000 lines)"
     ],
     "passes": true
+  },
+  {
+    "id": "026-simple-prompt-mode",
+    "category": "functional",
+    "description": "Add simple prompt mode that copies a minimal prompt with file path, line number, diff, and comment",
+    "steps": [
+      "Add a 'Copy Simple Prompt' button in the review summary panel alongside existing buttons",
+      "When clicked, build a simple text payload for each comment in the format:\n@{filepath}:{lineno}\n{diff}\n\nComment: {comment}",
+      "Separate multiple comments with a blank line delimiter",
+      "Copy the formatted simple prompt to the system clipboard",
+      "Show a toast notification confirming the prompt was copied",
+      "Style the button consistently with existing action buttons"
+    ],
+    "passes": false
+  },
+  {
+    "id": "027-move-tips-banner-top-left",
+    "category": "ui",
+    "description": "Move the tips banner from bottom-right to top-left",
+    "steps": [
+      "Locate the tips banner component and its positioning styles",
+      "Change the banner position from bottom-right to top-left of the viewport or app layout",
+      "Ensure the banner does not overlap with the sidebar or header",
+      "Verify the banner still dismisses and functions correctly after repositioning",
+      "Test in both dark and light themes"
+    ],
+    "passes": false
+  },
+  {
+    "id": "028-split-copy-button",
+    "category": "ui",
+    "description": "Merge 'Simple' and 'Copy Prompt' into a single split button with dropdown, like GitHub's 'Create pull request' button",
+    "steps": [
+      "Replace the two separate 'Simple' and 'Copy Prompt' buttons in ReviewSummary with a single split button component",
+      "The main button area triggers the currently selected copy mode (default: 'Copy Prompt')",
+      "An arrow/chevron on the right side opens a dropdown menu listing the two options: 'Copy Prompt' and 'Simple Prompt'",
+      "Each dropdown option shows a checkmark next to the currently selected mode",
+      "Selecting a dropdown option changes the default action and closes the dropdown",
+      "Clicking outside the dropdown closes it",
+      "Style to match GitHub's split button pattern: primary section + divider + arrow section, with a popover dropdown"
+    ],
+    "passes": false
   }
 ]

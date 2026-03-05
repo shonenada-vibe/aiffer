@@ -8,11 +8,34 @@
     onClose: () => void;
     onSubmitToAi: () => void;
     onCopyPrompt: () => void;
+    onCopySimplePrompt: () => void;
   }
 
-  let { isOpen, onClose, onSubmitToAi, onCopyPrompt }: Props = $props();
+  let { isOpen, onClose, onSubmitToAi, onCopyPrompt, onCopySimplePrompt }: Props = $props();
 
   let confirmClear = $state(false);
+  let copyMode = $state<"full" | "simple">("simple");
+  let copyDropdownOpen = $state(false);
+
+  function handleCopyAction() {
+    if (copyMode === "simple") {
+      onCopySimplePrompt();
+    } else {
+      onCopyPrompt();
+    }
+  }
+
+  function selectCopyMode(mode: "full" | "simple") {
+    copyMode = mode;
+    copyDropdownOpen = false;
+  }
+
+  function handleClickOutsideDropdown(e: MouseEvent) {
+    const target = e.target as HTMLElement;
+    if (!target.closest(".split-btn-wrapper")) {
+      copyDropdownOpen = false;
+    }
+  }
 
   interface CommentGroup {
     filePath: string;
@@ -62,6 +85,8 @@
     confirmClear = false;
   }
 </script>
+
+<svelte:window onclick={handleClickOutsideDropdown} />
 
 {#if isOpen}
   <aside class="flex w-96 flex-col border-l border-[var(--panel-border)] bg-[var(--panel-bg)]">
@@ -216,12 +241,48 @@
         {/if}
         {#if !confirmClear}
           <div class="flex items-center gap-2">
-            <button
-              class="rounded-md border border-[var(--panel-border)] px-3 py-1.5 text-sm font-medium text-[var(--app-fg)] hover:bg-[var(--panel-border-subtle)]"
-              onclick={onCopyPrompt}
-            >
-              Copy Prompt
-            </button>
+            <!-- Split copy button -->
+            <div class="split-btn-wrapper relative">
+              <div class="flex items-stretch rounded-md border border-[var(--panel-border)]">
+                <button
+                  class="split-btn-main rounded-l-md px-3 py-1.5 text-sm font-medium text-[var(--app-fg)] hover:bg-[var(--panel-border-subtle)]"
+                  onclick={handleCopyAction}
+                >
+                  {copyMode === "simple" ? "Simple Prompt" : "Copy Prompt"}
+                </button>
+                <button
+                  class="split-btn-arrow flex items-center rounded-r-md border-l border-[var(--panel-border)] px-1.5 text-[var(--app-fg)] hover:bg-[var(--panel-border-subtle)]"
+                  title="Select copy mode"
+                  onclick={() => (copyDropdownOpen = !copyDropdownOpen)}
+                >
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M4.427 7.427l3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z" />
+                  </svg>
+                </button>
+              </div>
+              {#if copyDropdownOpen}
+                <div class="split-btn-dropdown absolute bottom-full right-0 z-10 mb-1 w-48 rounded-lg border border-[var(--panel-border)] bg-[var(--panel-bg)] py-1 shadow-lg">
+                  <button
+                    class="split-btn-option flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--app-fg)] hover:bg-[var(--panel-border-subtle)]"
+                    onclick={() => selectCopyMode("full")}
+                  >
+                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="currentColor" style="visibility: {copyMode === 'full' ? 'visible' : 'hidden'};">
+                      <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+                    </svg>
+                    <span>Copy Prompt</span>
+                  </button>
+                  <button
+                    class="split-btn-option flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--app-fg)] hover:bg-[var(--panel-border-subtle)]"
+                    onclick={() => selectCopyMode("simple")}
+                  >
+                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="currentColor" style="visibility: {copyMode === 'simple' ? 'visible' : 'hidden'};">
+                      <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+                    </svg>
+                    <span>Simple Prompt</span>
+                  </button>
+                </div>
+              {/if}
+            </div>
             <button
               class="rounded-md px-3 py-1.5 text-sm font-medium text-white"
               style="background-color: var(--btn-primary-bg);"

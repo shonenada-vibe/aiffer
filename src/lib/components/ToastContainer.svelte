@@ -17,7 +17,7 @@
 </script>
 
 {#if toastStore.toasts.length > 0}
-  <div class="fixed bottom-4 right-4 z-[200] flex flex-col gap-2">
+  <div class="fixed top-14 left-4 z-[200] flex flex-col gap-2">
     {#each toastStore.toasts as toast (toast.id)}
       <div
         class="toast-item toast-{toast.type} flex items-start gap-2 rounded-lg px-4 py-3 shadow-lg"
@@ -51,7 +51,7 @@
   @keyframes toast-slide-in {
     from {
       opacity: 0;
-      transform: translateX(20px);
+      transform: translateX(-20px);
     }
     to {
       opacity: 1;
