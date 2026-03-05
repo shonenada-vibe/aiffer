@@ -13,20 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: "aiffer ${{ github.ref_name }}"
-          body: "See assets below for platform-specific installers."
-          draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
-
-  release:
-    needs: create-release
+  build-targets:
     strategy:
       fail-fast: false
       matrix:
@@ -77,26 +64,58 @@ jobs:
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build and publish release (macOS)
+      - name: Build release bundles (macOS)
         if: contains(matrix.target, 'apple-darwin')
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_name }}
-          args: --target ${{ matrix.target }} --bundles app
+        run: bun run tauri build --target ${{ matrix.target }} --bundles app
 
-      - name: Build and publish release (non-macOS)
+      - name: Build release bundles (non-macOS)
         if: "!contains(matrix.target, 'apple-darwin')"
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run tauri build --target ${{ matrix.target }}
+
+      - name: Package macOS app bundle
+        if: contains(matrix.target, 'apple-darwin')
+        run: |
+          BUNDLE_DIR="src-tauri/target/${{ matrix.target }}/release/bundle/macos"
+          APP_PATH="$BUNDLE_DIR/aiffer.app"
+          if [ -d "$APP_PATH" ]; then
+            tar czf "$BUNDLE_DIR/aiffer_${{ matrix.target }}.app.tar.gz" -C "$BUNDLE_DIR" "aiffer.app"
+          fi
+
+      - name: Upload target artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tagName: ${{ github.ref_name }}
-          args: --target ${{ matrix.target }}
+          name: release-${{ matrix.target }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/**
+          if-no-files-found: warn
+
+  publish-release:
+    needs: build-targets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist/release-assets
+
+      - name: List collected artifacts
+        run: find dist/release-assets -type f | sort
+
+      - name: Create GitHub release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "aiffer ${{ github.ref_name }}"
+          body: "See assets below for platform-specific installers."
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            dist/release-assets/**/*
 
   homebrew-cask:
-    needs: release
+    needs: publish-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
