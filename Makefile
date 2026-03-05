@@ -1,4 +1,4 @@
-.PHONY: dev build check test lint clippy fmt clean install install-deps install-cli setup
+.PHONY: dev build check test lint clippy fmt clean install install-deps install-cli setup cask
 
 # Development
 dev:
@@ -55,3 +55,9 @@ test:
 clean:
 	cd src-tauri && cargo clean
 	rm -rf dist
+
+# Generate Homebrew cask file from a GitHub release tag
+# Usage: make cask TAG=v0.1.0 [REPO=owner/name] [OUT=dist/homebrew/aiffer.rb]
+cask:
+	@if [ -z "$(TAG)" ]; then echo "Usage: make cask TAG=v0.1.0 [REPO=owner/name] [OUT=path]"; exit 1; fi
+	@./scripts/generate-homebrew-cask.sh --tag "$(TAG)" $(if $(REPO),--repo "$(REPO)",) $(if $(OUT),--output "$(OUT)",)

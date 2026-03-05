@@ -33,7 +33,7 @@ jobs:
         include:
           - platform: macos-latest
             target: aarch64-apple-darwin
-          - platform: macos-13
+          - platform: macos-15-intel
             target: x86_64-apple-darwin
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
@@ -77,10 +77,47 @@ jobs:
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build and publish release
+      - name: Build and publish release (macOS)
+        if: contains(matrix.target, 'apple-darwin')
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          args: --target ${{ matrix.target }} --bundles app
+
+      - name: Build and publish release (non-macOS)
+        if: "!contains(matrix.target, 'apple-darwin')"
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
           args: --target ${{ matrix.target }}
+
+  homebrew-cask:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cask generation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Generate Homebrew cask
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash scripts/generate-homebrew-cask.sh \
+            --tag "${{ github.ref_name }}" \
+            --repo "${{ github.repository }}" \
+            --output "dist/homebrew/aiffer.rb"
+
+      - name: Upload Homebrew cask to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            dist/homebrew/aiffer.rb
