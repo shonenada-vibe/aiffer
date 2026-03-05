@@ -60,7 +60,7 @@ pub fn validate_git_repo(path: String) -> Result<String, CommandError> {
     Ok(canonical)
 }
 
-/// Get the initial folder path from CLI arguments (if provided).
+/// Get the initial folder path from CLI arguments, or fall back to CWD.
 #[tauri::command]
 pub fn get_initial_path() -> Option<String> {
     let args: Vec<String> = std::env::args().collect();
@@ -80,6 +80,12 @@ pub fn get_initial_path() -> Option<String> {
             }
         }
     }
+
+    // Fall back to current working directory
+    if let Ok(cwd) = std::env::current_dir() {
+        return Some(cwd.to_string_lossy().to_string());
+    }
+
     None
 }
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicholasgasior/tauri-config-schema/main/schema.json",
-  "productName": "Aiffer",
+  "productName": "aiffer",
   "version": "0.1.0",
   "identifier": "com.aiffer.app",
   "build": {

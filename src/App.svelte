@@ -154,6 +154,28 @@
     }
   }
 
+  async function handleCopyPrompt() {
+    try {
+      const comments: CommentInput[] = commentStore.allComments.map((c) => ({
+        filePath: c.filePath,
+        lineNumber: c.lineNumber,
+        lineType: c.lineType,
+        body: c.body,
+      }));
+
+      const payload = await invoke<ReviewPayload>("build_review_payload", {
+        path: diffStore.folderPath,
+        comments,
+      });
+
+      await navigator.clipboard.writeText(payload.formattedText);
+      toastStore.success("Prompt copied to clipboard");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toastStore.error(`Failed to copy prompt: ${msg}`);
+    }
+  }
+
   async function handleDiffTypeChange(type_: DiffType) {
     if (
       commentStore.commentCount > 0 &&
@@ -425,6 +447,7 @@
       isOpen={reviewPanelOpen}
       onClose={() => (reviewPanelOpen = false)}
       onSubmitToAi={handleSubmitToAi}
+      onCopyPrompt={handleCopyPrompt}
     />
 
     <AiPanel

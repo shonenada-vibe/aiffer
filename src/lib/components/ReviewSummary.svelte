@@ -7,9 +7,10 @@
     isOpen: boolean;
     onClose: () => void;
     onSubmitToAi: () => void;
+    onCopyPrompt: () => void;
   }
 
-  let { isOpen, onClose, onSubmitToAi }: Props = $props();
+  let { isOpen, onClose, onSubmitToAi, onCopyPrompt }: Props = $props();
 
   let confirmClear = $state(false);
 
@@ -214,13 +215,21 @@
           </button>
         {/if}
         {#if !confirmClear}
-          <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-white"
-            style="background-color: var(--btn-primary-bg);"
-            onclick={onSubmitToAi}
-          >
-            Submit to AI
-          </button>
+          <div class="flex items-center gap-2">
+            <button
+              class="rounded-md border border-[var(--panel-border)] px-3 py-1.5 text-sm font-medium text-[var(--app-fg)] hover:bg-[var(--panel-border-subtle)]"
+              onclick={onCopyPrompt}
+            >
+              Copy Prompt
+            </button>
+            <button
+              class="rounded-md px-3 py-1.5 text-sm font-medium text-white"
+              style="background-color: var(--btn-primary-bg);"
+              onclick={onSubmitToAi}
+            >
+              Submit to AI
+            </button>
+          </div>
         {/if}
       </div>
     {/if}

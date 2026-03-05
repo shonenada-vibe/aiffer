@@ -327,5 +327,45 @@
       "Document how to run tests in CLAUDE.md"
     ],
     "passes": true
+  },
+  {
+    "id": "023-copy-prompt-button",
+    "category": "ui",
+    "description": "Add a 'Copy Prompt' button beside 'Submit to AI' that copies the AI prompt to clipboard",
+    "steps": [
+      "Add a 'Copy Prompt' button next to the existing 'Submit to AI' button in the review summary panel",
+      "When clicked, build the same review payload that would be sent to the AI agent",
+      "Copy the formatted prompt (system prompt + review payload) to the system clipboard using Tauri's clipboard API or navigator.clipboard",
+      "Show a toast notification confirming the prompt was copied",
+      "Style the button to visually complement the 'Submit to AI' button (secondary/outline style)"
+    ],
+    "passes": true
+  },
+  {
+    "id": "024-cli-command",
+    "category": "functional",
+    "description": "Add 'aiffer' CLI command that opens the app with the current folder",
+    "steps": [
+      "Configure Tauri to produce an 'aiffer' binary name on build",
+      "Ensure running 'aiffer' with no arguments opens the app and uses the current working directory as the repo path",
+      "Ensure running 'aiffer /path/to/repo' opens the app with the specified folder (existing task 020 already supports CLI argument)",
+      "Add instructions in CLAUDE.md or README for installing the CLI (e.g., symlink or PATH setup)",
+      "Verify the CLI command works on macOS"
+    ],
+    "passes": true
+  },
+  {
+    "id": "025-show-added-file-full-content",
+    "category": "ui",
+    "description": "Show full file content for newly added files in the diff viewer",
+    "steps": [
+      "Detect files with 'Added' status in the diff data",
+      "For added files, display the entire file content (all lines as additions) instead of only the diff hunks",
+      "Ensure line numbers start from 1 and are displayed correctly in the new-line-number gutter",
+      "Apply syntax highlighting to the full file content",
+      "Ensure comments can be added on any line of the full file view",
+      "Handle large files gracefully (consider virtualization or lazy rendering for files over 1000 lines)"
+    ],
+    "passes": true
   }
 ]

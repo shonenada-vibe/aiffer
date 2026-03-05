@@ -33,6 +33,7 @@ pub fn get_diff<'a>(repo: &'a Repository, diff_type: &str) -> Result<Diff<'a>, G
     let mut opts = DiffOptions::new();
     opts.include_untracked(true);
     opts.recurse_untracked_dirs(true);
+    opts.show_untracked_content(true);
 
     match diff_type {
         "unstaged" => {
@@ -392,6 +393,41 @@ mod tests {
         assert_eq!(files.len(), 1);
         assert_eq!(files[0].path, "untracked.txt");
         assert_eq!(files[0].status, FileStatus::Added);
+    }
+
+    #[test]
+    fn test_untracked_file_shows_full_content() {
+        let (dir, repo) = setup_test_repo();
+
+        // Create an untracked file with multiple lines
+        let new_path = dir.path().join("new_file.rs");
+        fs::write(
+            &new_path,
+            "fn main() {\n    println!(\"hello\");\n    let x = 42;\n}\n",
+        )
+        .expect("write new file");
+
+        let diff = get_diff(&repo, "unstaged").expect("get diff");
+        let files = parse_diff(&diff).expect("parse diff");
+
+        assert_eq!(files.len(), 1);
+        assert_eq!(files[0].status, FileStatus::Added);
+        assert!(!files[0].hunks.is_empty(), "Untracked file should have hunks with content");
+        assert_eq!(
+            files[0].stats.additions, 4,
+            "All 4 lines should be additions"
+        );
+
+        // Verify line content is present
+        let all_lines: Vec<&DiffLine> = files[0]
+            .hunks
+            .iter()
+            .flat_map(|h| h.lines.iter())
+            .collect();
+        assert!(
+            all_lines.iter().any(|l| l.content.contains("fn main()")),
+            "Should contain full file content"
+        );
     }
 
     #[test]
