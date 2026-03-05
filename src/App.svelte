@@ -1,5 +1,6 @@
 <script lang="ts">
   import { open } from "@tauri-apps/plugin-dialog";
+  import { writeText } from "@tauri-apps/plugin-clipboard-manager";
   import { invoke } from "@tauri-apps/api/core";
   import Header from "./lib/components/Header.svelte";
   import Sidebar from "./lib/components/Sidebar.svelte";
@@ -168,7 +169,7 @@
         comments,
       });
 
-      await navigator.clipboard.writeText(payload.formattedText);
+      await writeText(payload.formattedText);
       toastStore.success("Prompt copied to clipboard");
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
