@@ -380,7 +380,7 @@
       "Show a toast notification confirming the prompt was copied",
       "Style the button consistently with existing action buttons"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "027-move-tips-banner-top-left",
@@ -393,7 +393,7 @@
       "Verify the banner still dismisses and functions correctly after repositioning",
       "Test in both dark and light themes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "id": "028-split-copy-button",
@@ -408,6 +408,20 @@
       "Clicking outside the dropdown closes it",
       "Style to match GitHub's split button pattern: primary section + divider + arrow section, with a popover dropdown"
     ],
-    "passes": false
+    "passes": true
+  },
+  {
+    "id": "029-github-ci-workflow",
+    "category": "build",
+    "description": "Add GitHub Actions workflow to compile the project for macOS and Linux",
+    "steps": [
+      "Create .github/workflows/build.yml with a workflow triggered on push and pull requests",
+      "Add a macOS job that installs dependencies (Bun, Rust), runs frontend checks (bun run check), runs Rust checks (cargo clippy, cargo test), and builds the Tauri app",
+      "Add a Linux job (Ubuntu) with the same steps plus required system dependencies (libwebkit2gtk, libgtk-3-dev, etc.)",
+      "Use a matrix strategy to run both platforms in parallel",
+      "Cache Cargo registry/target and node_modules/bun cache for faster CI",
+      "Ensure the workflow produces build artifacts (app bundles) that can be downloaded"
+    ],
+    "passes": true
   }
 ]
